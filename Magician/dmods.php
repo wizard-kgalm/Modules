@@ -1,19 +1,22 @@
 <?php
-if(!isset($config['dmods2'])){
-	$config['dmods2']['modules'] = array (
+if(file_exists('./config/dmods.df')){
+	$dmods = include './config/dmods.df';
+}
+if(empty($dmods)){
+	$dmods['modules'] = array (
 		'Dante(0.12.3)' => 
 		array (
 			'link' => 'http://download.botdom.com/3o7ye/Dante%200.12.3.zip',
-			'by' => 'NarratorOfTownsville',
+			'by' => 'KnightOfBreath',
 		),
 		'Colorcheck' => 
 		array (
-			'link' => 'http://download.botdom.com/ap7au/colors.zip',
+			'link' => 'http://download.botdom.com/eckgu/colors.zip',
 			'by' => 'Wizard-Kgalm',
 		),
-		'Contra(5.3)' => 
+		'Contra(5.6.5)' => 
 		array (
-			'link' => 'http://download.botdom.com/mwpjf/Contra_5.3_public.zip',
+			'link' => 'http://download.botdom.com/nxp53/Contra_5.6.5.zip',
 			'by' => 'photofroggy',
 		),
 		'Dice' => 
@@ -36,9 +39,9 @@ if(!isset($config['dmods2'])){
 			'link' => 'http://download.botdom.com/ux77i/input%20for%200.10%20SVN.zip',
 			'by' => 'Wizard-Kgalm',
 		),
-		'Magician(4.0)' => 
+		'Magician(4.5)' => 
 		array (
-			'link' => 'http://download.botdom.com/opmfh/Magician4.0.zip',
+			'link' => 'http://download.botdom.com/mt5ni/Magician4.5.zip',
 			'by' => 'Wizard-Kgalm',
 		),
 		'Maltriv' => 
@@ -168,217 +171,117 @@ if(!isset($config['dmods2'])){
 		),
 		'llama_giver' =>
 		array (
-			'link' => 'http://download.botdom.com/p6p11/llama.zip',
+			'link' => 'http://download.botdom.com/qluka/llama.zip',
 			'by' => 'Wizard-Kgalm',
 		),
 	);
-	$config['dmods'] = $config['dmods2'];
-	save_config('dmods');
-	save_config('dmods2');
-}
-if(!isset($config['dmods']['modules'])){
-	$config['dmods'] = $config['dmods2'];
-	save_config('dmods');
-	$dAmn->say("$from: Dmods list updated successfully.",$c);
+	foreach($dmods['modules'] as $name => $payload){
+		$dmods['modules'][strtolower($name)] = $payload;
+	}
+	ksort($dmods['modules']);
+	save_info('./config/dmods.df', $dmods);
 }
 switch ($args[0]){
 	case "dmods":
 		switch($args[1]){
 			case "add":
-				if(!empty($args[2])){
-					if(!empty($args[3])){
-						if(!empty($args[4])){
-							$dmods = array('name'=>$args[2], 'link'=>$args[3], 'by'=>$args[4],);
-						}else
-							$dmods = $dmods = array('name'=>$args[2], 'link'=>$args[3],);
-						$moo = false;
-						foreach($config['dmods']['modules'] as $id => $mod){ $mock = $mod[0]; 
-							if(strtolower($mock) == strtolower($args[2])){
-								$moo = true;
-							}
-						}
-						if(!$moo){
-							$config['dmods']['modules'][$dmods['name']]['link'] = $dmods['link'];
-							if(isset($dmods['by'])){
-								$config['dmods']['modules'][$dmods['name']]['by'] = $dmods['by'];
-							}
-							ksort($config['dmods']['modules']);
-							save_config('dmods');
-								$dAmn->say("$from: $args[2] has been successfully added!",$c);
-						}else
-							$dAmn->say("$from: $args[2] has already been added!",$c);
-					}else
-						$dAmn->say("$from: You must provide a download link to the module to add it.",$c);
-				}else
-					$dAmn->say("$from: Usage:{$tr}dmods add <i>module</i>.",$c);
+				if(empty($args[2]) || empty($args[3])){
+					return $dAmn->say($f. "Usage: {$tr}dmods <i>add [module] [link] [author]</i>. [module] is the name of the module, [link] is the download link to the module, [author] is an optional, but preferably included, parameter, and is the person (dA username) who made the module.", $c);
+				}
+				if(isset($dmods['modules'][$args[2]]) || isset($dmods['modules'][strtolower($args[2])])){
+					return $dAmn->say($f. "The {$args[2]} module is already listed.", $c);
+				}
+				if(!empty($args[4])){
+					$dmods['modules'][strtolower($args[2])] = array('link' => $args[3], 'by' => $args[4],);
+				}else{
+					$dmods['modules'][strtolower($args[2])] = array('link' => $args[3],);
+				}
+				save_info("./config/dmods.df", $dmods);
+				$dAmn->say($f. "Module {$args[1]} has been added successfully.", $c);
 				break;
 			case "del":
 			case "delete":
 			case "remove":
-				if(isset($config['dmods'])){
-					if(empty($args[2])){	
-						return $dAmn->say("$from: You must include the name of the module you want to delete.",$c);
-					}
-					$remove = FALSE;
-					foreach($config['dmods']['modules'] as $name => $info){
-						if(strtolower($name) === strtolower($args[2])){
-							unset($config['dmods']['modules'][$name]);
-							ksort($config['dmods']['modules']);
-							save_config('dmods');
-							$remove = TRUE;
-						}
-					}
-					if($remove){
-						$dAmn->say("$from: $args[2] has been removed from the list!",$c);
-					}else
-						$dAmn->say("$from: $args[2] was not found on the list. Check to make sure it exists using {$tr}dmods check <i>name</i>",$c); 
-				}else
-					return $dAmn->say("$from: There aren't any modules stored yet.",$c);
-				break;
+				if(empty($args[2])){
+					return $dAmn->say($f. "Usage: {$tr}dmods del [module]. [module] is the name of the module you would like to delete.", $c);
+				}
+				if(!isset($dmods['modules'][strtolower($args[2])]) || !isset($dmods['modules'][$args[2]])){
+					return $dAmn->say($f. "Module $args[2] is not on the list. See {$tr}dmods list.", $c);
+				}
+				unset($dmods['modules'][strtolower($args[2])]); unset($dmods['modules'][$args[2]]);
+				ksort($dmods['modules']);
+				save_info('./config/dmods.df', $dmods);
+				$dAmn->say($f. "Module {$args[1]} has been removed successfully.", $c);
+			break;
 			case "change":
-				if($args[2] !=""){
-					if(!isset($config['dmods']['modules'][$args[2]])){
-						return $dAmn->say($f ."$args[2] was not found on the list. Type {$tr}dmods list to see the full list of names.",$c);
-					}
-					if($args[3] !=""){
-						$config['dmods']['modules'][$args[2]]['link'] = $args[3];
-						save_config('dmods');
-						$dAmn->say($f ."Download link successfully updated.",$c);
-					}else
-						$dAmn->say($f ."You need to provide a link to change the current one to.",$c);
-				}else
-					$dAmn->say($f ."You need the name of a module and a download link to change that module's download link to.",$c);
-				break;
+				if(empty($args[2]) || empty($args[3])){
+					return $dAmn->say($f. "Usage: {$tr}dmods change <i>[module] [link]</i>. [module] is the name of the module, and [link] is the new/updated link to the module. This command is for updating the download link.", $c);
+				}
+				if(!isset($dmods['modules'][strtolower($args[2])]) || !isset($dmods['modules'][$args[2]])){
+					return $dAmn->say($f. "Module $args[2] is not on the list. See {$tr}dmods list.", $c);
+				}
+				$dmods['modules'][strtolower($args[2])]['link'] = $args[3];
+				save_info("./config/dmods.df", $dmods);
+				$dAmn->say($f. "Module {$args[2]}'s download link updated successfully.", $c);
+			break;
 			case "change2":
-				if($args[2] !=""){
-					if(!isset($config['dmods']['modules'][$args[2]])){
-						return $dAmn->say($f ."$args[2] was not found. {$tr}dmods list will display a list of all the available modules.",$c);
-					}
-					if($args[3] !=""){
-						$config['dmods']['modules'][$args[2]]['by'] = $args[3];
-						save_config('dmods');$dAmn->say($f ."Author successfully updated.",$c);
-					}else
-						$dAmn->say($f ."You need to provide an author to change the current one to.",$c);
-				}else
-					$dAmn->say($f ."You need the name of a module and the name of the author of that module to change this.",$c);
-					break;
+				if(empty($args[2]) || empty($args[3])){	
+					return $dAmn->say($f. "Usage: {$tr}dmods change2 <i>[module] [author]</i>. [module] is the name of the module, and [author] is the dA username who made the module.", $c);
+				}
+				if(!isset($dmods['modules'][strtolower($args[2])]) || !isset($dmods['modules'][$args[2]])){
+					return $dAmn->say($f. "Module $args[2] is not on the list. See {$tr}dmods list.", $c);
+				}
+				$dmods['modules'][strtolower($args[2])]['by'] = $args[3];
+				save_info("./config/dmods.df", $dmods);
+				$dAmn->say($f. "Module {$args[2]}'s author has been updated successfully.", $c);
+			break;
 			case "rname":
-				if(!empty($args[2])){
-					if(!empty($args[3])){
-						foreach($config['dmods']['modules'] as $id => $mod){
-							if(strtolower($id) == strtolower($args[2])){
-								$config['dmods']['modules'][$args[3]] = $config['dmods']['modules'][$id];
-								unset($config['dmods']['modules'][$id]);
-								save_config('dmods');
-								$founding = TRUE;
-							}
-						}
-						if($founding){
-							$dAmn->say("$from: Module $args[2] has been renamed $args[3]!",$c);
-						}else
-							$dAmn->say("$from: Module $args[2] could not be found.",$c);
-					}else
-						$dAmn->say("$from: You must provide a name to rename the module to.",$c);
-				}else
-					$dAmn->say("$from: Usage: {$tr}dmods rname <i>modulename <b>RENAME</b></i>.",$c);
-				break;
+				if(empty($args[2]) || empty($args[3])){
+					return $dAmn->say($f. "Usage: {$tr}dmods rname <i>[module] [newname]</i>. [module] is the name of the module you're changing the name of, and [newname] is the name you wish to change it to.", $c);
+				}
+				if(!isset($dmods['modules'][strtolower($args[2])]) || !isset($dmods['modules'][$args[2]])){
+					return $dAmn->say($f. "Module $args[2] is not on the list. See {$tr}dmods list.", $c);
+				}
+				if(isset($dmods['modules'][strtolower($args[2])]) || isset($dmods['modules'][$args[2]])){
+					if(isset($dmods['modules'][strtolower($args[3])]) || isset($dmods['modules'][$args[3]])){
+						return $dAmn->say($f. "Module {$args[3]} already exists.", $c);
+					}
+					$dmods['modules'][strtolower($args[3])] = $dmods['module'][strtolower($args[2])];
+					unset($dmods['modules'][strtolower($args[2])]);
+					save_info('./config/dmods.df', $dmods);
+					$dAmn->say($f. "Module {$args[2]} has successfully been renamed {$args[3]}.", $c);
+				}
+			break;
 			case "list":
-				$say="";
-				if(!empty($config['dmods'])){
-					if($args[2] == ""){
-						$say .="The Modules stored are: <br/><sup>";
-						foreach($config['dmods']['modules'] as $id => $mod){
-							$say .="[".$id."] ";
-						}
-						$dAmn->say($say,$c);
-					}else
-					if($args[2] == "links"){
-						$say .="The Modules you have stored on here are: <br/><sup>";
-						foreach($config['dmods']['modules'] as $id => $mod){
-							$say .="[{$id} {$config['dmods']['modules'][$id]['link']}]  ";
-						}
-						$dAmn->say($say,$c);
-					}else
-					if($args[2] == "all"){
-						$say .="The Modules you have stored on here are: <br/><sup>";
-						foreach($config['dmods']['modules'] as $id => $mod){
-						$say .=" [{$id} {$config['dmods']['modules'][$id]['link']} {$config['dmods']['modules'][$id]['by']}] <br> ";
-						}
-						$dAmn->say($say,$c);
+				$say = "";
+				if(empty($dmods)){
+					return $dAmn->say($f. "File not created properly by the bot. Check the config folder for 'dmods.df'.", $c);
+				}
+				$say .= "Your stored modules include: <br/><sup>";
+				foreach($dmods['modules'] as $mod => $info){
+					if(empty($args[2]) || strtolower($args[2]) !== "all"){
+						$say .= " [ <a href=\"{$dmods['modules'][$mod]['link']}\" title=\"{$mod}\">{$mod}</a> ],";
+					}else{
+						$say .= " <a href=\"{$dmods['modules'][$mod]['link']}\" title=\"{$mod}\">{$mod}</a> by :dev{$dmods['modules'][$mod]['by']}:,";
 					}
-				}else
-					$dAmn->say("$from: There aren't any modules stored.",$c);
-				break;
+				}
+				$dAmn->say($say, $c);
+			break;
 			case "check":
-				if(!empty($config['dmods'])){
-					if($args[2] !=""){
-						$finding = FALSE;
-						foreach($config['dmods']['modules'] as $id => $mod){
-							if(strtolower($id) == strtolower($args[2])){
-								$finding = TRUE;
-								$link= $config['dmods']['modules'][$id]['link'];
-								$by = $config['dmods']['modules'][$id]['by'];
-								$name = $id;
-							}
-						}
-						if($finding){
-							if(isset($by)){
-								$dAmn->say("$from: <b><a href=\"".$link."\" title=\"{$name}\">{$name}</a></b> by :dev{$by}:",$c);
-							}else
-								$dAmn->say("$from: <b><a href=\"".$link."\" title=\"{$name}\">{$name}</a></b>",$c);
-						}else
-							$dAmn->say("$from: No {$args[2]} module exists.",$c);
-					}else
-						$dAmn->say("$from: Usage: {$tr}dmods check <i>NAME</i>",$c);
-				}else
-					$dAmn->say("$from: You have no mods stored.",$c);
-				break; // The below was my attempt at pulling the links directly from the page. Didn't go well. Haha. Or at least, I don't remember it going well.
-			/*case "hidden": //Also made worthless by that asshole DeathShadow--666, because he removed all links. 
-				$testinfo = @file_get_contents("http://botdom.com/wiki/Dante_modules");
-				preg_match_all("/plainlinks devart\" title=\"(.*)\"/Ums", $testinfo, $matches);
-				$config['dtest']['info'] = $matches;
-				foreach($config['dtest']['info'][1] as $number => $names){
-					$names = substr($names,8);
-					$config['dtest']['info'][1][$number] = $names;
+				if(empty($dmods)){
+					return $dAmn->say($f. "File not created properly by the bot. Check the config folder for 'dmods.df'.", $c);
 				}
-				preg_match_all("/external text\" title=\"(.*)\"/Ums", $testinfo, $matches2);
-				unset($config['dtest']['links']);
-				foreach($matches2[1] as $number => $links){
-					$disgard = FALSE;
-					foreach($config['dtest']['links'] as $number => $link){
-						if($links == $link){
-							$disgard = TRUE;
-						}
-					}
-					if(!$disgard){
-						if(stristr($links, "http://download")){
-							$config['dtest']['links'][] = $links;
-						}
-					}
-					
+				if(empty($args[2])){
+					return $dAmn->say($f. "Usage: {$tr}dmods check [module]. [module] is the module you're checking for on the list.", $c);
 				}
-				save_config('dtest');
-				//preg_match("/gmi-name=\"(.*)\"/Ums", $devpage, $matches);
-				break;
-			*/
+				if(!isset($dmods['modules'][strtolower($args[2])]) || !isset($dmods['modules'][$args[2]])){
+					return $dAmn->say($f. "Module $args[2] is not on the list. See {$tr}dmods list.", $c);
+				}
+				$dAmn->say("<a href=\"{$dmods['modules'][strtolower($args[2])]['link']}\" title=\"{$args[2]}\">$args[2]</a> by :dev{$dmods['modules'][strtolower($args[2])]['by']}:", $c);
+			break;
 			default: 
-				$say="";
-				if(!empty($config['dmods'])){
-					$say .= "These are the modules for Dante:<br><sup>";
-					$i = 0;
-					foreach($config['dmods']['modules'] as $id => $mod){
-						$link = $config['dmods']['modules'][$id]['link'];
-						$by = $config['dmods']['modules'][$id]['by'];
-						if(isset($by)){
-							$say .= "[<a href=\"".$link."\" title=\"{$id} by {$by}\">{$id}</a>] "; 
-						}else{
-							$say .= "[<a href=\"".$link."\" title=\"{$id}\">{$id}</a>] ";
-						}
-					}
-					$dAmn->say($say,$c);
-				}else
-					$dAmn->say("$from: To get started, type {$tr}dmods add [module name] [download link] [by] to add a module. Leave by blank if you don't know who the author is.",$c);
-				break;
+				$dAmn->say($f. "Usage: {$tr}dmods <i>[add/del/change/change2/rname/list/check] [module]/[all] [newname/link] [author]</i>.<br><sup>{$tr}dmods <i>add [module] [link] [author]</i> adds [module] to the list of dmods. [module] is the name of the module (reqired), [link] is the download link to [module] (required), and [author] is the writer of the module (optional, but preferred).<br>{$tr}dmods <i>del [module]</i> deletes [module] from the list of dmods. [module] is the name of the module you want to delete (required).<br>{$tr}dmods <i>change [module] [link]</i> changes the download link of [module], if it exists. [module] is the name of the module you are changing (required), and [link] is the updated download link of [module] (required).<br>{$tr}dmods <i>change2 [module] [author]</i> changes (or adds) the writer of [module]. [module] is the name of the module you are changing (required), and [author] is the writer of the module (required).<br>{$tr}dmods <i>rname [module] [newname]</i> renames [module] to [newname]. [module] is the name of the module you're changing the name of (required), and [newname] is the name you're changing [module] to (required).<br>{$tr}dmods <i>list [all]</i> lists all the stored dmods with the download link. If [all] is included, it also shows the author, if listed (optional).<br>{$tr}dmods <i>check [module]</i> checks for [module] on the dmods list. [module] is the name of the module you are checking for.</sup>", $c);
+			break;
 		}
-		break;
+	break;
 }

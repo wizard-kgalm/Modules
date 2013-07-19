@@ -1,27 +1,23 @@
 <?php
 include_once('modules/Magician/functions.php');
-switch($args[0]){																		// Version 4.5. Finally combined these commands.. and moved atswap to here!
+if(file_exists("./config/logins.df")){
+	$logins = include "./config/logins.df";
+}																						// This will ( has ) need updating with the new core. It's been taken care of.
+switch($args[0]){																		// Version 5.0. Finally combined these commands.. and moved atswap to here!
 	case "login":
 	case "token":
-		if(empty($args[1])){															// Here's our thing. Return correct usage on empty command. 
+		if(empty($args[1]) || empty ($args[2])){										// Here's our thing. Return correct usage on empty command. 
 			return $dAmn->say("$from: Usage:{$tr}{$args[0]} <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
 		}
 		if($user->has($from, 99)){
 			$tuser = strtolower($args[1]);												// Is our username on the list? Let's check.
-			if(isset($config['logins']['login'][strtolower($args[1])])){
-				$tpass = base64_decode($config['logins']['login'][strtolower($args[1])]); // It is, let's decode the password.
-			}elseif(isset($config['logins']['hidden'][strtolower($args[1])]) && empty($tpass)){ //Perhaps our username isn't on that list. Let's check the secondary one.	
-				$tpass = $config['logins']['hidden'][strtolower($args[1])];				// We found it there! Grabbing the password. ( It's never on the hidden list ).
-			}elseif(!empty($args[2])){													// It's not on either list? Use the second argument as the password
+			if(isset($logins['login'][strtolower($args[1])])){
+				$tpass = base64_decode($logins['login'][strtolower($args[1])]);			// It is, let's decode the password.
+			}elseif(isset($logins['hidden'][strtolower($args[1])]) && empty($tpass)){ 	//Perhaps our username isn't on that list. Let's check the secondary one.	
+				$tpass = $logins['hidden'][strtolower($args[1])];						// We found it there! Grabbing the password. ( It's never on the hidden list ).
+			} else {																	// It's not on either list? Use the second argument as the password
 				$tpass = $args[2];
-			}elseif(empty($args[2])){													// If no password was included either, let's see who sent the command.
-				if($from == $config['bot']['owner']){									// It's the owner, ask for input. ( I despise input, it locks up the bot. )
-					$dAmn->say("$from: Place password in bot window.",$c);
-					print "\nPlease input {$args[1]}'s password below.\n";				// Assume we'll get the password from that.
-					$tpass = trim(fgets(STDIN));										// Set it to $tpass. Now for the fun part.
-				}else																	// You're not the owner ( or host ), back off! That'll just lock up ( and kill ) the bot.
-					return $dAmn->say("$from: $args[1] is not a stored login. Username and password required for non-stored logins.",$c);
-			}			
+			}
 			$tcheck = testlogin($tuser, $tpass);										// Now for the token grabber. Let's send the username and password.
 			if(is_array($tcheck)){														// There's an array? Let's show the error so we know what's wrong.
 				return $dAmn->say("$from: Error returned. {$tcheck['error']}",$c);
