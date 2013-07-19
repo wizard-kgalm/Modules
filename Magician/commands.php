@@ -64,7 +64,6 @@ switch($args[0]){
 			return;
 		}else
 			$dAmn->say( "$argsF: {$shanking}", $c );
-	break;
-}
-
+	break;	// Break $shank.
+}// End switch. 68 lines.
 ?>

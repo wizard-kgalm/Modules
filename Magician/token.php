@@ -37,7 +37,7 @@ switch($args[0]){																		// Version 5.0. Finally combined these comman
 	case "atswap":																		// My red-headed stepchild, $atswap. <3 
 		if(empty($argsF)){
 			return $dAmn->say("$from: Please put your username and authtoken to change logins. If you don't know what an authtoken is, don't use this command.",$c);
-		}else	// 7/30/11 below, 7/18/2013 right.										// I'll leave in the following, since I've been mocking that for 5 fucking versions. Haha
+		}else	// 7/30/11 below, 7/19/2013 right.										// I'll leave in the following, since I've been mocking that for 5 fucking versions. Haha
 		//Since this command involves authtokens, which I don't imagine you have memorized, no sense in allowing it in the bot window, as you can't copypaste in command prompts.
 		if(empty($args[2])){
 			return $dAmn->say("$from: Username and authtoken required. To login with a password, see {$tr}login. Caution: Do not use in public rooms as this is sensitive info.",$c);
@@ -48,8 +48,8 @@ switch($args[0]){																		// Version 5.0. Finally combined these comman
 		$config['bot']['username'] = $args[1];											// Let's plug that info into the $config. 
 		$config['bot']['token'] = $args[2];
 		save_config('bot');
-		$dAmn->say("$from: Token accepted. Changing logins, please wait.",$c);				// Let's send that disconnect, baby. 
+		$dAmn->say("$from: Token accepted. Changing logins, please wait.",$c);			// Let's send that disconnect, baby. 
 		$dAmn->send("disconnect\n".chr(0));
 		break;
-}// END switch. 58 lines (after moving the comments along the side, like the currant version.
+}// END switch. 54 lines (after moving the comments along the side, like the currant version.
 ?>
