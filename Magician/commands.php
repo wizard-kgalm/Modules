@@ -1,8 +1,8 @@
 <?php
 include_once('modules/Magician/functions.php');
 $tt=$config['bot']['trigger'];
-switch($args[0]){														// Here we go, round 3.6. Hahahahaha
-	case "atswap":														// Good ol' $atswap. <3 
+switch($args[0]){														// Version 4.0.. Released 7/16/2011 ( That's 1.5 years after the previous version ).
+	case "atswap":														// Good ol' $atswap. Still heading the game, here.<3 
 		$config['bot']['username']=$args[1];
 		$config['bot']['token']=$args[2];
 		if($argsF==""){
@@ -21,7 +21,7 @@ switch($args[0]){														// Here we go, round 3.6. Hahahahaha
 		} 
 		$dAmn->send("disconnect\n".chr(0));								// Let's change accounts now. Send the disconnect.
 		break;
-	case "show":														// Ah, $show. Now completely simplified to $show logins list. Rather verbose, and a retarded alias.
+	case "show":														// What do you know, this made it well into 2011. Did not know that. 
 		switch($args[1]) {
 			case "logins":
 				if($args[2] !=""){
@@ -30,64 +30,76 @@ switch($args[0]){														// Here we go, round 3.6. Hahahahaha
 						return null;
 					}else
 					$say="";
-					if(!empty($config['logins']['login'])){				// Oh look, it only took four versions to update to $config['logins']['login'][$username] = $password.
+					if(!empty($config['logins']['login'])){
 						$say .="<sup>The logins you have stored are:<br/>";
 						foreach($config['logins']['login'] as $id=>$us){
-							ksort($id);									// Still using ksort in the wrong place... and wrong way at this point.
+							ksort($id);
 							$say .= " {$id} | ";
 						}
-					}else												// I.. wat. How does this even work properly without the { } around the failure message? 
-						$say .="$from: There aren't currently any usernames stored."; // This would simply add this to the message regardless. Oh my - Hell, it might not even
-						$dAmn->say($say,$c);							// even show the list in this order. I are jeanyus
+					}else
+						$say .="$from: There aren't currently any usernames stored.";
+						$dAmn->say($say,$c);
 				}else
-					$dAmn->say($f. "Usage: ".$config['bot']['trigger']."token logins list.",$c); // $token logins list? Oh, this ought to be good. 
-				break;	// break $show logins
-		}break;			// break $show
-	case "login":		// Enter $login command.
-		if(empty($args[1])){											// Ah, the $login command. Let's see how much easier we are now.
-			return $dAmn->say("$from: Usage: {$tr}login <i>username [password]</i>. If the login is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);														
-		}																// So, uh.. we learned return $command. It's only demonstrated in limited amounts.
-		if($user->has($from, 99)){										// Priv check! Why are you touching this shit if you aren't an owner?
-			if(isset($config['logins']['login'][1])){					// $logins array conversion. I'm so proud of myself.
-				foreach($config['logins']['login'] as $lo => $hi){		// Here's where we use stupid variables to convert from 1 => array ( 0 => $username, 1 => $password ).
+					$dAmn->say($f. "Usage: ".$config['bot']['trigger']."token logins list.",$c);
+				break;
+		}break;
+	case "me":																// Ah, added $me to the repertoire. 
+		if($args[1][0] == "#"){ 											// Just so it's recorded, this was for $input, but added here for command usage anyway.
+			$dAmn->me($argsE[2],$args[1]);
+		}else
+			$dAmn->me($argsF,$c);
+		break;
+	case "npmsg":															// $npmsg, same as the above. Added for use with input.
+		if($args[1][0] == "#"){
+			$dAmn->npmsg($argsE[2],$args[1]);
+		}else
+			$dAmn->npmsg($argsF,$c);
+		break;
+	case "login":
+		if(empty($args[1])){												// This command seems relatively unchanged from previous versions.
+			return $dAmn->say("$from: Usage: ".$tr."login <i>username [password]</i>. If the login is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
+		}
+		if($user->has($from, 99)){
+			if(isset($config['logins']['login'][1])){
+				foreach($config['logins']['login'] as $lo => $hi){
 					$config['logins2']['login'][$config['logins']['login'][$lo][0]] = $config['logins']['login'][$lo][1];
-					save_config('logins2');								// And apparently make it into a backup, which still remains now, if I remember correctly.
-				}														// and we're using spaces before and after = and after commas. <3 organization.
-				$config['logins'] = $config['logins2'];					// But now we're going to save over the original with the new one!
+					save_config('logins2');
+				}
+				$config['logins'] = $config['logins2'];
 				save_config('logins');
-				$dAmn->say("$from: Logins list updated and fixed.",$c);	// List updated and repaired ( ie: Making it less fucking retarded ).
+				$dAmn->say("$from: Logins list updated and fixed.",$c);
 			}
-			if(isset($config['invisilogins'])){							// Oh, changing the invisdible list too! Oh wait, I don't update to ['hidden'] for a while.
+			if(isset($config['invisilogins'])){
 				if(isset($config['invisilogins']['login'][1])){
-					foreach($config['invisilogins']['login'] as $lo => $hi){ // $lo => $hi. I'm fucking loony. 
+					foreach($config['invisilogins']['login'] as $lo => $hi){
 						$config['logins3']['login'][$config['invisilogins']['login'][$lo][0]] = $config['invisilogins']['login'][$lo][1];
-						save_config('logins3');							// This also would have worked as $config['bla']['login'][$hi[0]] = $hi[1];
-					}													// Instead of $config['bla']['login'][$config['bla']['login'][$lo][0]]. 
-					$config['invisilogins'] = $config['logins3'];		// A third back up file? Well, alright then.
+						save_config('logins3');
+					}
+					$config['invisilogins'] = $config['logins3'];
 					save_config('invisilogins');
 					$dAmn->say("$from: Hidden Logins list updated and fixed.",$c);
 				}
-			}	// Searching is much cleaner, albeit too complicated. All we really need is, if( isset( $config['logins']['login'][strtolower( $args[1] )] ) ).
-			foreach($config['logins']['login'] as $boob => $bies){		// Call to hilarious variables. 
-				if(strtolower($boob) === strtolower($args[1])){			// If $args[1] = $boob, we've found our username.
-					$config['bot']['username'] = $boob;					// Let's save our username to the $config['bot'] area.
-					$config['token']['username'] = $boob;				// And our details to $config['token'] for the grabber ( Still haven't learned.. ).
-					$config['token']['password'] = $bies;
-					save_config('bot');save_config('token');			// Save both, we're on our way.
+			}
+			foreach($config['logins']['login'] as $boob => $bies){
+				if(strtolower($boob) === strtolower($args[1])){
+					$config['bot']['username'] = $boob;
+					$config['token']['username'] = $boob;
+					$config['token']['password'] = @base64_decode($bies);		// This must be the version where I introduced base64_encode. Only to the original list.
+					save_config('bot');save_config('token');
 					$num = $boob;
-					$found = TRUE;										// We.. we really don't need one of these here, following our above statement. 
+					$found = TRUE;
 				}
 			}
-			if($found){
-				$toke = token();										// Call to the token command, fetch that token.
-				if(empty($toke)){										// Empty token? There's a number of reasons for this, not specific enough.
-					return $dAmn->say("$from: No token, bad pass?",$c);	
+			if($found){															// Oh look, I called upon token for the $login command.. That's weird of me.
+				$toke = token();
+				if(empty($toke)){												// I also neglected to return the reason for failure.. Since it's given now.
+					return $dAmn->say("$from: No token, bad pass?",$c);
 				}
 				$config['bot']['token'] = $toke;
-				$dAmn->say($f ."Login accepted. Changing logins, please wait.",$c);	// Oh, got rid of sleep( 1 );
+				$dAmn->say($f ."Login accepted. Changing logins, please wait.",$c);
 				return $dAmn->send("disconnect\n".chr(0));
 			}
-			foreach($config['invisilogins']['login'] as $invi => $sible){ // Second unecessarily long search.. 
+			foreach($config['invisilogins']['login'] as $invi => $sible){		// And I didn't combine this. I must not have had a breakthrough or something yet. 
 				if(strtolower($invi) === strtolower($args[1])){
 					$config['bot']['username'] = $invi;
 					$config['token']['username'] = $invi;
@@ -97,7 +109,7 @@ switch($args[0]){														// Here we go, round 3.6. Hahahahaha
 					$ifound = TRUE;
 				}
 			}
-			if($ifound){
+			if($ifound){														// We're still obnoxiously verbose. Needs some serious trimming. 
 				$toke = token();
 				if(empty($toke)){
 					return $dAmn->say("$from: No token, bad pass?",$c);
@@ -106,12 +118,15 @@ switch($args[0]){														// Here we go, round 3.6. Hahahahaha
 				$dAmn->say($f ."Login accepted. Changing logins, please wait.",$c);
 				return $dAmn->send("disconnect\n".chr(0));
 			}
-			if(empty($args[2])){										// Now we're automatically continuing. If your account isn't on the lists, and you included $args[2]
-				$dAmn->say("$from: Place password in bot window.",$c);	// We'll process that info and continue. If left blank, input window time.
-				print "\nwhat is $username's password?\n";
-				$args[2] = trim(fgets(STDIN));
+			if(empty($args[2])){
+				if(strtolower($from) == strtolower($config['bot']['owner'])){
+					$dAmn->say("$from: Place password in bot window.",$c);
+					print "\nPlease input {$args[1]}'s password below.\n";
+					$args[2] = trim(fgets(STDIN));
+				}else
+					return $dAmn->say("$from: Username and password required.",$c);
 			}
-			$config['bot']['username'] = $args[1];						// Same steps as before. Could probably stand to narrow it down from this?
+			$config['bot']['username'] = $args[1];
 			$config['token']['username'] = $args[1];
 			$config['token']['password'] = $args[2];
 			$toke = token();
@@ -119,19 +134,20 @@ switch($args[0]){														// Here we go, round 3.6. Hahahahaha
 				return $dAmn->say("$from: No token, bad pass?",$c);
 			}
 			$config['bot']['token'] = $toke;
+			save_config("bot");
 			$dAmn->say($f ."Login accepted. Changing logins, please wait.",$c);
 			$dAmn->send("disconnect\n".chr(0));
 		}else
 			return $dAmn->say("$from: This is an owner only command.",$c);
-	break; // Break out of $login, 80 lines. ( Wow, 80 ).
+		break;
 	case "kickroll":
 		if(!isset($argsF)){
 			$dAmn->say($f . "Please say who to kickroll.", $c);
 		}else
 		if ($user->has($from,99)){
-			$dAmn->say("$argsE[1], Prepare to be Rolled." , $c); 
+			$dAmn->say("$args[1], Prepare to be Rolled." , $c); 
 			sleep(0);
-			$dAmn->kick($argsE[1], $c, "$argsE[2] :thumb82026411: WE'RE NO STRANGERS TO LOVE
+			$dAmn->kick($args[1], $c, "$argsE[2] :thumb82026411: WE'RE NO STRANGERS TO LOVE
 YOU KNOW THE RULES, AND SO DO I
 A FULL COMMITMENT'S WHAT I'M THINKING OF
 YOU WOULDN'T GET THAT FROM ANY OTHER GUY
@@ -142,14 +158,15 @@ NEVER GONNA LET YOU DOWN
 NEVER GONNA RUN AROUND AND DESERT YOU
 NEVER GONNA MAKE YOU CRY
 NEVER GONNA SAY GOODBYE
-NEVER GONNA TELL YOU LIES AND HURT YOU :thumb82026411: <abbr title='()'>&#8238;");
+NEVER GONNA TELL YOU LIES AND HURT YOU :thumb82026411: <abbr title='()'>&#09;");
 		}else
-			$dAmn->kick($from,$c, "Trying to kickroll $argsF without the proper privs. :P");
-	break;
-	case "addons":
-		$dAmn->say("<sup><abbr title=\"$from\"></abbr>:thumb103219269: Here are the addons! Start with <a href=\"http://addons.mozilla.org/en-US/firefox/downloads/latest/748\">Greasemonkey</a>, then after restarting, download <a href=\"http://nebulon.botdom.com/experiments/daxfix.user.js\">dAx</a>, <a href=\"http://damncolors.freehostia.com/dAmnColors.user.js\">dAmn Colors</a>, <a href=\"http://www.javascripthost.com/s1/bin/dAmnpwn.user.js\">dAmn.pwn</a>, <a href=\"http://www.jasonwhutchinson.com/GM/Emotes/emotescript.user.js\">Emotes Script</a>, <a href=\"http://testground2206.freehostia.com/damn_goodies.user.js\">dAmn Goodies</a>, and <a href=\"http://userstyles.org/styles/userjs/16505/dA%20Message%20Network%20-%20Sexify%20dAmn.user.js\">Sexify dAmn</a>, <a href=\"http://temple.24bps.com/public/damntcf.user.js\" title=\"\">Tabcolor fix</a>, <a href=\"http://temple.24bps.com/public/tinydamn.user.js\" title=\"\">TinydAmn</a>, <a href=\"http://userscripts.org/scripts/source/32307.user.js\" title=\"\">Word breaker</a>.", $c);
-	break;
-	case "shank":
+			$dAmn->kick($from,$c, "Trying to kickroll $argsF without the proper privs. =P");
+		break;
+
+	case "addons":	// Oh look, we updated addons to include superdAmn instead of dAx. 
+		$dAmn->say("<sup><abbr title=\"$from\"></abbr>:thumb103219269: Here are the addons! Start with <a href=\"http://addons.mozilla.org/en-US/firefox/downloads/latest/748\">Greasemonkey</a>, <a href=\"http://addons.mozilla.org/en-US/firefox/downloads/file/76721/damnautojoin-0.4.0-fx.xpi\">dAmn Autojoin</a>, then after restarting, download <a href=\"http://temple.24bps.com/superdamn/superdamn.user.js\">SuperdAmn</a>, <a href=\"http://damncolors.nol888.com/dAmnColors.user.js\">dAmn Colors</a>, <a href=\"http://botspam.webs.com/damn_goodies.user.js\">dAmn Goodies</a>, and <a href=\"http://userstyles.org/styles/userjs/16505/dA%20Message%20Network%20-%20Sexify%20dAmn.user.js\">Sexify dAmn</a>, <a href=\"http://temple.24bps.com/public/damntcf.user.js\" title=\"\">Tabcolor fix</a>, <a href=\"http://temple.24bps.com/public/tinydamn.user.js\" title=\"\">TinydAmn</a>, <a href=\"http://userscripts.org/scripts/source/32307.user.js\" title=\"\">Word breaker</a>.", $c);
+		break;
+	case "shank":															// We also added an array of shanking 
 		$shanks = array(':stab: <b> >:C </b>',':stab: <b>D:< </b>',':thumb95624834:<b> >:C </b>',':thumb95624834: <b> D:< </b>',);
 		$shanking = $shanks[array_rand($shanks)];
 		if(!isset($argsF)){
@@ -167,6 +184,6 @@ NEVER GONNA TELL YOU LIES AND HURT YOU :thumb82026411: <abbr title='()'>&#8238;"
 			return;
 		}else
 		$dAmn->say("$argsF: " .$shanking, $c);
-	break;
-} // End of switch and file. 171 lines. 
+		break;
+} // Break switch, end of file. 188 lines. We got longer, thanks to $me and $npmsg.
 ?>

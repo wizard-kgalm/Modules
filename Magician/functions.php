@@ -1,99 +1,160 @@
 <?php
-		function token(){ 								// Magician 3.6a, still haven't learned my lesson about function( $var1, $var2 ); 
-		internalMessage( "Getting authtoken..." );
-		global $event,$config;
-		$UN=$config['token']['username']; $UP=$config['token']['password'];	// Oh yeah, let's call upon preset variables in a file, because why not.
-		$query = "ref=https%3A%2F%2Fwww.deviantart.com%2Fusers%2Flogin&username=" . $UN . "&password=" . $UP . "&reusetoken=1";
-		$a = fsockopen( "ssl://www.deviantart.com", 443, $errno, $errstr );
-		fputs( $a, "POST /users/login HTTP/1.1\n" );
-		fputs( $a, "Host: www.deviantart.com\n" );
-		fputs( $a, "User-Agent: " . BotUserAgent . "\n" );
-		fputs( $a, "Accept: text/html\n" );
-		fputs( $a, "Cookie: skipintro=1\n" );
-		fputs( $a, "Content-Type: application/x-www-form-urlencoded\n" );
-		fputs( $a, "Content-Length: " . strlen( $query ) . "\n\n" . $query );
-		$response = "";
-		while( !feof( $a ) ) $response .= fgets( $a, 8192 );
-		fclose( $a );
-		if( !empty( $response ) ) {
-			$full1 = explode( "Set-Cookie: ", $response );
-			$full1 = explode( ";", $full1[1] );
-			$fullcookie = $full1[0] . ';';
-			$response = urldecode( $response );
-			if( stristr( $response, "Set-Cookie: " ) && stristr( $response, "authtoken" ) ) {
-				$bits = explode( "userinfo=", $response );
-				$cookie = substr( $bits[1], 0, strpos( $bits[1], "; expir" ) );
-				$cookie = unserialize( $cookie );
-				if( !empty( $cookie['authtoken'] ) ){
-					$config['token']['token']=$cookie['authtoken']; save_config('token');
-					$config['bot']['token']=$cookie['authtoken']; save_config('bot');
-					internalMessage( "Authtoken: " . $cookie['authtoken'] );
-					$event = "authtoken";
-					include f( "system/callables/event.php" );
-					return $cookie['authtoken'];
-					$config['bot']['token']=$cookie['authtoken']; save_config('bot');break;
-				 }else{
-					internalMessage( "Oops, couldn't get the authtoken. You may need to find it yourself." );$login = parse_ini_file( f( "config.ini" ) );$config['token']['password']=$login['password'];$config['token']['username']=$login['username'];save_config('token');$config['bot']['username']=$login['username'];$config['bot']['token']=token();save_config('bot');$event = "authtoken-fail";	// Again, shoved on a single line, still hideous.
-					include f( "system/callables/event.php" );
-					return FALSE;
-				}
-			} else {
-				internalMessage( "Oops, couldn't get the authtoken. You may need to find it yourself." );$login = parse_ini_file( f( "config.ini" ) );$config['token']['password']=$login['password'];$config['token']['username']=$login['username'];save_config('token');$config['bot']['username']=$login['username'];$config['token']['token']=token();save_config('bot');$event = "authtoken-fail";			// Something else failed, let's do the same thing as above, instead of returning something else.
-					include f( "system/callables/event.php" );
-					return FALSE;
-			}
-		} else {
-			internalMessage( "Oops, couldn't get the authtoken. You may need to find it yourself." );$login = parse_ini_file( f( "config.ini" ) );$config['token']['password']=$login['password'];$config['token']['username']=$login['username'];save_config('token');$config['bot']['username']=$login['username'];$config['bot']['token']=token();save_config('bot');$event = "authtoken-fail";								// Oh what, a third failure? AGAIN WITH THE SAME MESSAGE! No differentiating between reasons.
-					include f( "system/callables/event.php" );
-					return FALSE;
+	function token(){ 														// Version 4.0. This was only left here because I wasn't sure if anything still called on it.
+		//function getAuthToken() {											// Oh yeah, make it more obvious we copy pasted from the core. haha
+		global $dAmn, $config;												// Call our globals.. 
+	  // Method to get the cookie! Yeah! :D       							// Looking at the preceding, it's the current incarnation of token grabbing, post cookie update.
+	  // Our first job is to open an SSL connection with our host.			// Skipping ahead to testlogins, as that's the current function on all released models.
+	  $username = $config['token']['username']; $pass = $config['token']['password'];
+	  if(empty($config['token']['username'])){ return $dAmn->say("No username","#randwewt");}
+	  if(empty($pass)){ return $dAmn->say("No Password","#randwewt");}		// Went ahead and fixed odd indentation issue. I'm sure it existed still.
+		 $socket = fsockopen("ssl://www.deviantart.com", 443);
+		// If we didn't manage that, we need to exit!
+		if($socket === false) {
+		return array(
+				'status' => 2,
+				'error' => 'Could not open an internet connection');
 		}
-}		function cookie(){	// Oh, what's this? A second, seperate function for returning the cookie specifically? Because that's necessary. 
-		internalMessage( "Getting authtoken..." );
-		global $event,$config;	// This function was really made so that we could use the cookie to change accounts on dA. Before they changed that, anyway.
-		$UN=$config['token']['username']; $UP=$config['token']['password'];
-		$query = "ref=https%3A%2F%2Fwww.deviantart.com%2Fusers%2Flogin&username=" . $UN . "&password=" . $UP . "&reusetoken=1";
-		$a = fsockopen( "ssl://www.deviantart.com", 443, $errno, $errstr );
-		fputs( $a, "POST /users/login HTTP/1.1\n" );
-		fputs( $a, "Host: www.deviantart.com\n" );
-		fputs( $a, "User-Agent: " . BotUserAgent . "\n" );
-		fputs( $a, "Accept: text/html\n" );
-		fputs( $a, "Cookie: skipintro=1\n" );
-		fputs( $a, "Content-Type: application/x-www-form-urlencoded\n" );
-		fputs( $a, "Content-Length: " . strlen( $query ) . "\n\n" . $query );
-		$response = "";
-		while( !feof( $a ) ) $response .= fgets( $a, 8192 );
-		fclose( $a );
-		if( !empty( $response ) ) {
-			$full1 = explode( "Set-Cookie: ", $response );
-			$full1 = explode( ";", $full1[1] );
-			$fullcookie = $full1[0] . ';';
-			$response = urldecode( $response );
-			if( stristr( $response, "Set-Cookie: " ) && stristr( $response, "authtoken" ) ) {
-				$bits = explode( "userinfo=", $response );
-				$cookie = substr( $bits[1], 0, strpos( $bits[1], "; expir" ) );
-				$cookie = unserialize( $cookie );
-				if( !empty( $cookie['authtoken'] ) ){
-					$config['token']['token']=$cookie['authtoken']; save_config('token');
-					$config['bot']['token']=$cookie['authtoken']; save_config('bot');
-					internalMessage( "Authtoken: " . $fullcookie );
-					$event = "authtoken";
-					include f( "system/callables/event.php" );
-					return $fullcookie;
-					$config['bot']['token']=$fullcookie; save_config('bot');break;	// Wait, how is this supposed to work if, RETURN $fullcookie? 
-				 }else{
-					internalMessage( "Oops, couldn't get the authtoken. You may need to find it yourself." );$login = parse_ini_file( f( "config.ini" ) );$config['token']['password']=$login['password'];$config['token']['username']=$login['username'];save_config('token');$config['bot']['username']=$login['username'];$config['bot']['token']=token();save_config('bot');$event = "authtoken-fail";			// It failed. Let's call authtoken failure on a cookie issue.
-					include f( "system/callables/event.php" );
-					return FALSE;
-				}
-			} else {
-				internalMessage( "Oops, couldn't get the authtoken. You may need to find it yourself." );$login = parse_ini_file( f( "config.ini" ) );$config['token']['password']=$login['password'];$config['token']['username']=$login['username'];save_config('token');$config['bot']['username']=$login['username'];$config['token']['token']=token();save_config('bot');$event = "authtoken-fail";					// It failed because no "authtoken" response in the cookie.
-					include f( "system/callables/event.php" );
-					return FALSE;
-			}
-		} else {
-			internalMessage( "Oops, couldn't get the authtoken. You may need to find it yourself." );$login = parse_ini_file( f( "config.ini" ) );$config['token']['password']=$login['password'];$config['token']['username']=$login['username'];save_config('token');$config['bot']['username']=$login['username'];$config['bot']['token']=token();save_config('bot');$event = "authtoken-fail";
-					include f( "system/callables/event.php" );						// It failed because your internet connection didn't work and you had an empty response.
-					return FALSE;
-}
-}	// STILL BANKING AT 99 LINES. Well, got rid of 12 empty lines.
+		// Fill up the form payload
+		$POST = '&username='.urlencode($username);
+		$POST.= '&password='.urlencode($pass);
+		$POST.= '&remember_me=1';
+		// And now we send our header and post data and retrieve the response.
+		$response = $dAmn->send_headers(
+			$socket,
+			"www.deviantart.com",
+			"/users/login",
+			"http://www.deviantart.com/users/rockedout",
+			$POST
+		);
+		// Now that we have our data, we can close the socket.
+		fclose ($socket);
+		//And now we do the normal stuff, like checking if the response was empty or not.
+		if(empty($response))
+		return array(
+				'status' => 3,
+				'error' => 'No response returned from the server'
+		);
+		if(stripos($response, 'set-cookie') === false)
+		return array(
+				'status' => 4,
+				'error' => 'No cookie returned'
+			);
+		// Grab the cookies from the header
+		$response=explode("\r\n", $response);
+		$cookie_jar = array();
+		foreach ($response as $line)
+			if (strpos($line, "Set-Cookie:")!== false)
+				$cookie_jar[] = substr($line, 12, strpos($line, "; ")-12);
+		// Using these cookies, we're gonna go to chat.deviantart.com and get
+		// our authtoken from the dAmn client.
+		if (($socket = @fsockopen("ssl://www.deviantart.com", 443)) == false)
+			 return array(
+				'status' => 2,
+				'error' => 'Could not open an internet connection');
+		$response = $dAmn->send_headers(
+			$socket,
+			"chat.deviantart.com",
+			"/chat/Botdom",
+			"http://chat.deviantart.com",
+			null,
+			$cookie_jar
+		);
+		// Now search for the authtoken in the response
+		$cookie = null;
+		if (($pos = strpos($response, "dAmn_Login( ")) !== false)
+		{
+			$response = substr($response, $pos+12);
+			$cookie = substr($response, strpos($response, "\", ")+4, 32);
+		}
+		else //$dAmn->say($response ,"#randwewt");
+		return array(
+			'status' => 4,
+			'error' => 'No authtoken found in dAmn client'
+		);                 
+		// Because errors still happen, we need to make sure we now have an array!
+		if(!$cookie)
+		return array(
+				'status' => 5,
+				'error' => 'Malformed cookie returned'
+		);
+		// We got a valid cookie!
+		return $cookie;
+	}
+	function testlogin($username, $password){ 								// testlogin. We're flexible, it asks for $username and $password input.. beautiful.
+		global $dAmn, $config;												// It would seem no further comment is needed on this.
+		// Method to get the cookie! Yeah! :D       
+		// Our first job is to open an SSL connection with our host.
+		  $socket = fsockopen("ssl://www.deviantart.com", 443);
+		// If we didn't manage that, we need to exit!
+		if($socket === false) {
+		return array(
+				'status' => 2,
+				'error' => 'Could not open an internet connection');
+		}
+		// Fill up the form payload
+		$POST = '&username='.urlencode($username);
+		$POST.= '&password='.urlencode($password);
+		$POST.= '&remember_me=1';
+		// And now we send our header and post data and retrieve the response.
+		$response = $dAmn->send_headers(
+			$socket,
+			"www.deviantart.com",
+			"/users/login",
+			"http://www.deviantart.com/users/rockedout",
+			$POST
+		);
+		// Now that we have our data, we can close the socket.
+		fclose ($socket);
+		//And now we do the normal stuff, like checking if the response was empty or not.
+		if(empty($response))
+		return array(
+				'status' => 3,
+				'error' => 'No response returned from the server'
+		);
+		if(stripos($response, 'set-cookie') === false)
+		return array(
+				'status' => 4,
+				'error' => 'No cookie returned'
+			);
+		// Grab the cookies from the header
+		$response=explode("\r\n", $response);
+		$cookie_jar = array();
+		foreach ($response as $line)
+			if (strpos($line, "Set-Cookie:")!== false)
+				$cookie_jar[] = substr($line, 12, strpos($line, "; ")-12);
+		// Using these cookies, we're gonna go to chat.deviantart.com and get
+		// our authtoken from the dAmn client.
+		if (($socket = @fsockopen("ssl://www.deviantart.com", 443)) == false)
+			 return array(
+				'status' => 2,
+				'error' => 'Could not open an internet connection');
+		$response = $dAmn->send_headers(
+			$socket,
+			"chat.deviantart.com",
+			"/chat/Botdom",
+			"http://chat.deviantart.com",
+			null,
+			$cookie_jar
+		);
+		// Now search for the authtoken in the response
+		$cookie = null;
+		if (($pos = strpos($response, "dAmn_Login( ")) !== false)
+		{
+			$response = substr($response, $pos+12);
+			$cookie = substr($response, strpos($response, "\", ")+4, 32);
+		}
+		else 
+		return array(
+			'status' => 4,
+			'error' => 'No authtoken found in dAmn client'
+		);            
+		// Because errors still happen, we need to make sure we now have an array!
+		if(!$cookie)
+		return array(
+				'status' => 5,
+				'error' => 'Malformed cookie returned'
+		);
+		// We got a valid cookie!
+		return $cookie;
+	}	// Ah, our old command, still for some reason held at the bottom. Removed because it's commented out, and therefore taking up space.
 ?>	

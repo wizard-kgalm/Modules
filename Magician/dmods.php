@@ -48,7 +48,7 @@ if(!isset($config['dmods2'])){
 		),
 		'Magician(3.6)' => 
 		array (
-		'link' => 'http://download.botdom.com/e1ysu/Magician3.6.zip',
+		'link' => 'http://download.botdom.com/7kdyh/Magician3.6.zip',
 		'by' => 'Wizard-Kgalm',
 		),
 		'Maltriv' => 
@@ -186,7 +186,7 @@ if(!isset($config['dmods2'])){
 	save_config('dmods');
 	save_config('dmods2');
 }
-if(isset($config['dmods']['modules'][1])){
+if(!isset($config['dmods']['modules'])){
 	$config['dmods'] = $config['dmods2'];
 	save_config('dmods');
 	$dAmn->say("$from: Dmods list updated successfully.",$c);
@@ -346,28 +346,17 @@ switch ($args[0]){
 			default: 
 				$say="";
 				if(!empty($config['dmods'])){
-					$say .= "<sup>These are the modules for Dante:</sup><br>";
+					$say .= "<sup>These are the modules for Dante:</sup><br><sub>";
 					$i = 0;
 					foreach($config['dmods']['modules'] as $id => $mod){
 						$link = $config['dmods']['modules'][$id]['link'];
 						$by = $config['dmods']['modules'][$id]['by'];
-						while($i < 1){
-							if(isset($by)){
-								$say .= " <sub><sub><b><a href=\"".$link."\" title=\"{$id}\">{$id}</a></b> by :dev{$by}:</sub></sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							}else{
-								$say .= " <sub><sub><b><a href=\"".$link."\" title=\"{$id}\">{$id}</a></b></sub></sub>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ";
-							}$i++;
-						}$i++;
-
-						if($i == 3){
-							if(isset($by)){
-								$say .= " <sub><sub><b><a href=\"".$link."\" title=\"{$id}\">{$id}</a></b> by :dev{$by}:</sub></sub><br>";
-								$i = 0;
-							}else
-								$say .= " <sub><sub><b><a href=\"".$link."\" title=\"{$id}\">{$id}</a></b></sub></sub><br>";
-								$i = 0;
+						if(isset($by)){
+							$say .= "&middot; <a href=\"".$link."\" title=\"{$id} by {$by}\">{$id}</a> "; 
+						}else{
+							$say .= "&middot; <a href=\"".$link."\" title=\"{$id}\">{$id}</a> ";
 						}
-					}	
+					}
 					$dAmn->say($say,$c);
 				}else
 					$dAmn->say("$from: To get started, type ".$tt."$dmods add <i>module link (by)</i> to add a module. Leave by blank if you don't know who the author is.",$c);
