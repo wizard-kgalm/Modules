@@ -1,5 +1,5 @@
 <?php
-		function token(){ 								// Magician 3.0, still haven't learned my lesson about function( $var1, $var2 ); 
+		function token(){ 								// Magician 3.6a, still haven't learned my lesson about function( $var1, $var2 ); 
 		internalMessage( "Getting authtoken..." );
 		global $event,$config;
 		$UN=$config['token']['username']; $UP=$config['token']['password'];	// Oh yeah, let's call upon preset variables in a file, because why not.

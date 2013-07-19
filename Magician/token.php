@@ -1,106 +1,148 @@
 <?php
 include_once('modules/Magician/functions.php');
 $tt=$config['bot']['trigger'];
-switch($args[0]){
-	case "token":
-		if ($user->has($from,99)){
-			switch($args[1]) {
-				case "grab":																		// $token grab ID#. Fuck user-friendly. :')
-					$say = "";
-						if($args[2] !=""){															// I seem to have a penchant for trying to be overly obvious.
-							if(is_numeric($args[2])){
-								if(!isset($config['logins']['login'][$args[2]])){					// We learned how to use isset.
-									$dAmn->say($f ."The ID you provided either does not exist, there aren't any logins stored, or an error has occurred. Please check the file to make sure everything is correct before continuing. Type '" .$config['bot']['trigger']."store logins list' to see the list of login IDs and the username associated with the IDs.",$c);
-									return null;
-								}else{
-									$config['token']['username']=$config['logins']['login'][$args[2]][0];
-									$config['token']['password']=$config['logins']['login'][$args[2]][1];
-									save_config('token');
-								}
-								$dAmn->say($f."ID accepted. Grabbing authtoken.",$c); sleep(1);
-								$say .="$from: ".token();
-							}else
-								$say .="$from: Usage: '".$config['bot']['trigger']."show token grab [#]'. See ".$config['bot']['trigger']."show logins list for the list of IDs stored.";
-						}else
-							$say .="$from: Usage: '".$config['bot']['trigger']."show token grab  [#]'. See ".$config['bot']['trigger']."show logins list for the list of IDs stored.";
-							$dAmn->say($say, $c);
-							break;
-					case "manual":
-						$say="";
-						if($args[2] !=""){
-							if($args[3] ==""){
-								$dAmn->say("$from: Please put your password in the bot window.",$c);
-								print "\nWhat is the password?\n";
-								$args[3] = trim(fgets(STDIN));						
-							}else
-							if($args[3] !=""){
-								$PW=$args[3];
-								$UN=$args[2];
-								$config['token']['username']=$UN;
-								$config['token']['password']=$PW;
-								save_config('token');
-								$say .="$from: ".token();
-							}else
-								$say .="$from: You need to specify a username and password for this to work.";
-						}else
-							$say .="$from: Usage: ".$config['bot']['trigger']."show token manual 'username' 'password'. <br> *You can leave the password spot blank in either case to input the password directly to the bot.";
-							$dAmn->say($say,$c);
-						break;
-							default:
-								$dAmn->say($f."Usage: ".$config['bot']['trigger']."token grab/manual. Grab shows the user-specified ID's authtoken. If you don't know what authtokens are for or how to use them, I suggest you don't use this command.",$c);
-			}break;
+switch($args[0]){														// Do I even need to detail this file? Haha
+	case "token":														// It still hasn't occurred to me to combine this, login, and cookie to a single command with three outputs.
+		if(empty($args[1])){
+			return $dAmn->say("$from: Usage: ".$tr."token <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
+		}
+		if($user->has($from, 99)){										// You have to be an owner ( Trusted user ) to get access to authtokens of the stored accounts.
+			if(isset($config['logins']['login'][1])){					// Checking main list for the provided username.. We used isset here to convert though.. 
+				foreach($config['logins']['login'] as $lo => $hi){
+					$config['logins2']['login'][$config['logins']['login'][$lo][0]] = $config['logins']['login'][$lo][1];
+					save_config('logins2');
+				}
+				$config['logins'] = $config['logins2'];
+				save_config('logins');
+				$dAmn->say("$from: Logins list updated and fixed.",$c);
+			}
+			foreach($config['logins']['login'] as $boob => $bies){		// So why are we searching with this method instead of-.. lol
+				if(strtolower($boob) === strtolower($args[1])){
+					$config['token']['username'] = $boob;
+					$config['token']['password'] = $bies;
+					save_config('bot');
+					save_config('token');
+					$num = $boob;
+					$found = TRUE;
+				}
+			}
+			if($found){													// So we found it, let's grab the token, which is still using a round-about method.
+				$toke = token();
+				if(empty($toke)){
+					return $dAmn->say("$from: No token, bad pass?",$c);
+				}
+				return $dAmn->say($f ."{$toke}",$c);
+			}															// We didn't find it on the first list.. let's check the hidden list.
+			if(isset($config['invisilogins']['login'][1])){
+				foreach($config['invisilogins']['login'] as $lo => $hi){
+					$config['logins3']['login'][$config['invisilogins']['login'][$lo][0]] = $config['invisilogins']['login'][$lo][1];
+					save_config('logins3');
+				}
+				$config['invisilogins'] = $config['logins3'];
+				save_config('invisilogins');
+				$dAmn->say("$from: Hidden Logins list updated and fixed.",$c);
+			}															// Which will go through the same search process.. Should probably combine
+			foreach($config['invisilogins']['login'] as $invi => $sible){
+				if(strtolower($invi) === strtolower($args[1])){			// and if we still haven't found it, THEN ask for a password, THEN attempt to grab the token.
+					$config['token']['username'] = $invi;
+					$config['token']['password'] = $sible;
+					save_config('token');
+					$num = $invi;
+					$ifound = TRUE;
+				}
+			}
+			if($ifound){												// Instead of having three seperate possible command entities here. Found it on the hidden list.
+				$toke = token();										// Grab that token..
+				if(empty($toke)){										// No cookie. This is prior to requiring activation.. So it was either a bad password..
+					return $dAmn->say("$from: No token, bad pass?",$c);	// Or a bad username. This is also prior to attempting to validate the login before adding it.
+				}
+				return $dAmn->say($f ."{$toke}",$c);					// Just display the token now.
+			}
+			if(empty($args[2])){										// Wasn't on either list, and you left the password blank. input password into the window.
+				$dAmn->say("$from: Place password in bot window.",$c);
+				print "\nwhat is $username's password?\n";
+				$args[2] = trim(fgets(STDIN));
+			}
+			$config['token']['username']=$args[1];						// For some reason, the username wasn't set from the getgo. Setting now.
+			$config['token']['password']=$args[2];						// We've ( presumably ) received the password, adding that now.
+			$toke = token();
+				if(empty($toke)){
+					return $dAmn->say("$from: No token, bad pass?",$c);
+				}
+				return $dAmn->say($f ."{$toke}",$c);					// We don't really need a return here, but for safety..
 		}else
-			$dAmn->say($f. "This command is for the bot owner only.",$c);
-			return null;
-			break;
-	case "cookie":															// Cookie, doing 100% the same damn thing as $token.
-		if($user->has($from,99)){
-			switch($args[1]) {
-				case "grab":												// $cookie grab ID#. I will say it again. Screw simplicity and fuck user-friendly. :')
-					$say = "";
-					if($args[2] !=""){
-						if(is_numeric($args[2])){
-							if(!isset($config['logins']['login'][$args[2]])){
-								$dAmn->say($f ."The ID you provided either does not exist, there aren't any logins stored, or an error has occurred. Please check the file to make sure everything is correct before continuing. Type '" .$config['bot']['trigger']."store logins list' to see the list of login IDs and the username associated with the IDs.",$c);
-							return null;
-							}else{
-								$config['token']['username']=$config['logins']['login'][$args[2]][0];
-								$config['token']['password']=$config['logins']['login'][$args[2]][1];
-								save_config('token');
-							}
-							$dAmn->say($f."ID accepted. Grabbing cookie.",$c); sleep(1);
-							$say .="$from: ".cookie();
-						}else
-							$say .="$from: Usage: '".$config['bot']['trigger']."show cookie grab [#]'. See ".$config['bot']['trigger']."show logins list for the list of IDs stored.";
-					}else
-						$say .="$from: Usage: '".$config['bot']['trigger']."show cookie grab  [#]'. See ".$config['bot']['trigger']."show logins list for the list of IDs stored.";
-			$dAmn->say($say, $c);
-			break;
-				case "manual":
-					$say="";
-					if($args[2] !=""){
-						if($args[3] ==""){
-							$dAmn->say("$from: Please put your password in the bot window.",$c); print "\nWhat is the password?\n"; $args[4] = trim(fgets(STDIN));
-						}else
-						if($args[3] !=""){
-							$PW=$args[3];
-							$UN=$args[2];
-							$config['token']['username']=$UN;
-							$config['token']['password']=$PW;
-							save_config('token');
-							$say .="$from: ".cookie();
-						}else
-							$say .="$from: You need to specify a username and password for this to work.";
-					}else
-						$say .="$from: Usage: ".$config['bot']['trigger']."show cookie manual 'username' 'password'. <br> *You can leave the password spot blank in either case to input the password directly to the bot.";
-			$dAmn->say($say,$c);
-			break;
-				default:
-					$dAmn->say($f."Usage: ".$config['bot']['trigger']."show cookie grab/manual. Grab shows the user-specified ID's cookie. If you don't know what cookies are for or how to use them, I strongly suggest you don't use this command.",$c);
-				break; 
-			}break;
+		return $dAmn->say("$from: This is an owner only command.",$c);
+		break;
+	case "cookie":														// Not detailing the cookie command, as we both know word for word, it's a clone of token.
+		if(empty($args[1])){
+			return $dAmn->say("$from: Usage: ".$tr."cookie <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
+		}
+		if($user->has($from, 99)){
+			if(isset($config['logins']['login'][1])){
+				foreach($config['logins']['login'] as $lo => $hi){
+					$config['logins2']['login'][$config['logins']['login'][$lo][0]] = $config['logins']['login'][$lo][1];
+					save_config('logins2');
+				}
+				$config['logins'] = $config['logins2'];
+				save_config('logins');
+				$dAmn->say("$from: Logins list updated and fixed.",$c);
+			}
+			if(isset($config['invisilogins']['login'][1])){
+				foreach($config['invisilogins']['login'] as $lo => $hi){
+					$config['logins3']['login'][$config['invisilogins']['login'][$lo][0]] = $config['invisilogins']['login'][$lo][1];
+					save_config('logins3');
+				}
+				$config['invisilogins'] = $config['logins3'];
+				save_config('invisilogins');
+				$dAmn->say("$from: Hidden Logins list updated and fixed.",$c);
+			}
+			foreach($config['logins']['login'] as $boob => $bies){
+				if(strtolower($boob) === strtolower($args[1])){
+					$config['token']['username'] = $boob;
+					$config['token']['password'] = $bies;
+					save_config('bot');
+					save_config('token');
+					$num = $boob;
+					$found = TRUE;
+				}
+			}
+			if($found){
+				$toke = cookie();
+				if(empty($toke)){
+					return $dAmn->say("$from: No token, bad pass?",$c);
+				}
+				return $dAmn->say($f ."{$toke}",$c);
+			}
+			
+			foreach($config['invisilogins']['login'] as $invi => $sible){
+				if(strtolower($invi) === strtolower($args[1])){
+					$config['token']['username'] = $invi;
+					$config['token']['password'] = $sible;
+					save_config('token');
+					$num = $invi;
+					$ifound = TRUE;
+				}
+			}
+			if($ifound){
+				$toke = cookie();
+				if(empty($toke)){
+					return $dAmn->say("$from: No token, bad pass?",$c);
+				}
+				return $dAmn->say($f ."{$toke}",$c);
+			}
+			if(empty($args[2])){
+				$dAmn->say("$from: Place password in bot window.",$c);
+				print "\nwhat is $username's password?\n";
+				$args[2] = trim(fgets(STDIN));
+			}
+			$config['token']['username']=$args[1];
+			$config['token']['password']=$args[2];
+			$toke = cookie();
+				if(empty($toke)){
+					return $dAmn->say("$from: No token, bad pass?",$c);
+				}
+				return $dAmn->say($f ."{$toke}",$c);
 		}else
-			$dAmn->say($f. "This command is for the bot owner only.",$c);
-			return null;
-			break;
+		return $dAmn->say("$from: This is an owner only command.",$c);
+		break;
 }
