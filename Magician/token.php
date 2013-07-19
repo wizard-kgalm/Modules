@@ -1,153 +1,59 @@
 <?php
 include_once('modules/Magician/functions.php');
-$tt=$config['bot']['trigger'];
-switch($args[0]){
-	case "token":														// I must have not been that bright, still overly long, still using token instead of testlogins.
-		if(empty($args[1])){
-			return $dAmn->say("$from: Usage: ".$tr."token <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
+switch($args[0]){																		// Version 4.5. Finally combined these commands.. and moved atswap to here!
+	case "login":
+	case "token":
+		if(empty($args[1])){															// Here's our thing. Return correct usage on empty command. 
+			return $dAmn->say("$from: Usage:{$tr}{$args[0]} <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
 		}
 		if($user->has($from, 99)){
-			if(isset($config['logins']['login'][1])){
-				foreach($config['logins']['login'] as $lo => $hi){
-					$config['logins2']['login'][$config['logins']['login'][$lo][0]] = $config['logins']['login'][$lo][1];
-					save_config('logins2');
-				}
-				$config['logins'] = $config['logins2'];
-				save_config('logins');
-				$dAmn->say("$from: Logins list updated and fixed.",$c);
-			}
-			foreach($config['logins']['login'] as $boob => $bies){
-				if(strtolower($boob) === strtolower($args[1])){
-					$config['token']['username'] = $boob;
-					$config['token']['password'] = @base64_decode($bies);// This is likely the only change made to this entire process.
-					save_config('bot');
-					save_config('token');
-					$num = $boob;
-					$found = TRUE;
-				}
-			}
-			if($found){
-				$toke = token();
-				if(empty($toke)){
-					return $dAmn->say("$from: No token, bad pass?",$c);
-				}
-				return $dAmn->say($f ."javascript: dAmn_Login(\"{$args[1]}\",\"{$toke}\");",$c); // We've changed it to use the javascript syntax.. 
-			}
-			if(isset($config['invisilogins']['login'][1])){
-				foreach($config['invisilogins']['login'] as $lo => $hi){
-					$config['logins3']['login'][$config['invisilogins']['login'][$lo][0]] = $config['invisilogins']['login'][$lo][1];
-					save_config('logins3');
-				}
-				$config['invisilogins'] = $config['logins3'];
-				save_config('invisilogins');
-				$dAmn->say("$from: Hidden Logins list updated and fixed.",$c);
-			}
-			foreach($config['invisilogins']['login'] as $invi => $sible){
-				if(strtolower($invi) === strtolower($args[1])){
-					$config['token']['username'] = $invi;
-					$config['token']['password'] = $sible;
-					save_config('token');
-					$num = $invi;
-					$ifound = TRUE;
-				}
-			}
-			if($ifound){
-				$toke = token();
-				if(empty($toke)){
-					return $dAmn->say("$from: No token, bad pass?",$c);
-				}
-				return $dAmn->say($f ."javascript: dAmn_Login(\"{$args[1]}\",\"{$toke}\");",$c);
-			}
-			if(empty($args[2])){
-				if(strtolower($from) == strtolower($config['bot']['owner'])){	// Oh look, added filtering so other people can't kill the bot by leaving the password blank.
+			$tuser = strtolower($args[1]);												// Is our username on the list? Let's check.
+			if(isset($config['logins']['login'][strtolower($args[1])])){
+				$tpass = base64_decode($config['logins']['login'][strtolower($args[1])]); // It is, let's decode the password.
+			}elseif(isset($config['logins']['hidden'][strtolower($args[1])]) && empty($tpass)){ //Perhaps our username isn't on that list. Let's check the secondary one.	
+				$tpass = $config['logins']['hidden'][strtolower($args[1])];				// We found it there! Grabbing the password. ( It's never on the hidden list ).
+			}elseif(!empty($args[2])){													// It's not on either list? Use the second argument as the password
+				$tpass = $args[2];
+			}elseif(empty($args[2])){													// If no password was included either, let's see who sent the command.
+				if($from == $config['bot']['owner']){									// It's the owner, ask for input. ( I despise input, it locks up the bot. )
 					$dAmn->say("$from: Place password in bot window.",$c);
-					print "\nPlease input {$args[1]}'s password below.\n";
-					$args[2] = trim(fgets(STDIN));
-				}else
-					return $dAmn->say("$from: Username and password required. Do not use in public rooms.",$c);
+					print "\nPlease input {$args[1]}'s password below.\n";				// Assume we'll get the password from that.
+					$tpass = trim(fgets(STDIN));										// Set it to $tpass. Now for the fun part.
+				}else																	// You're not the owner ( or host ), back off! That'll just lock up ( and kill ) the bot.
+					return $dAmn->say("$from: $args[1] is not a stored login. Username and password required for non-stored logins.",$c);
+			}			
+			$tcheck = testlogin($tuser, $tpass);										// Now for the token grabber. Let's send the username and password.
+			if(is_array($tcheck)){														// There's an array? Let's show the error so we know what's wrong.
+				return $dAmn->say("$from: Error returned. {$tcheck['error']}",$c);
 			}
-			$config['token']['username']=$args[1];
-			$config['token']['password']=$args[2];
-			$toke = token();
-				if(empty($toke)){
-					return $dAmn->say("$from: No token, bad pass?",$c);
-				}
-				return $dAmn->say($f ."javascript: dAmn_Login(\"{$args[1]}\",\"{$toke}\");",$c);
-		}else
-		return $dAmn->say("$from: This is an owner only command.",$c);
-		break;	// Cookie commented out below, but left in.
-	/*case "cookie":
-		if(empty($args[1])){
-			return $dAmn->say("$from: Usage: ".$tr."cookie <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.",$c);
-		}
-		if($user->has($from, 99)){
-			if(isset($config['logins']['login'][1])){
-				foreach($config['logins']['login'] as $lo => $hi){
-					$config['logins2']['login'][$config['logins']['login'][$lo][0]] = $config['logins']['login'][$lo][1];
-					save_config('logins2');
-				}
-				$config['logins'] = $config['logins2'];
-				save_config('logins');
-				$dAmn->say("$from: Logins list updated and fixed.",$c);
+			if($args[0] == "login"){													// For $login, we're going to change the bot's config info. 
+				$config['bot']['username'] = $args[1];
+				$config['bot']['token'] = $tcheck;
+				save_config("bot");
+				$dAmn->say("$from: Login accepted. Changing logins, please wait.",$c);
+				$dAmn->send("disconnect\n".chr(0));										// We're good to go, kick that disconnect out. 
+			}else{
+				$dAmn->say("$from: javascript: dAmn_Login(\"{$args[1]}\",\"{$tcheck}\");",$c); // For token, just display the result here, in javascript command format.
 			}
-			if(isset($config['invisilogins']['login'][1])){
-				foreach($config['invisilogins']['login'] as $lo => $hi){
-					$config['logins3']['login'][$config['invisilogins']['login'][$lo][0]] = $config['invisilogins']['login'][$lo][1];
-					save_config('logins3');
-				}
-				$config['invisilogins'] = $config['logins3'];
-				save_config('invisilogins');
-				$dAmn->say("$from: Hidden Logins list updated and fixed.",$c);
-			}
-			foreach($config['logins']['login'] as $boob => $bies){
-				if(strtolower($boob) === strtolower($args[1])){
-					$config['token']['username'] = $boob;
-					$config['token']['password'] = @base64_decode($bies);
-					save_config('bot');
-					save_config('token');
-					$num = $boob;
-					$found = TRUE;
-				}
-			}
-			if($found){
-				$toke = cookie();
-				if(empty($toke)){
-					return $dAmn->say("$from: No token, bad pass?",$c);
-				}
-				return $dAmn->say($f ."{$toke}",$c);
-			}
-			
-			foreach($config['invisilogins']['login'] as $invi => $sible){
-				if(strtolower($invi) === strtolower($args[1])){
-					$config['token']['username'] = $invi;
-					$config['token']['password'] = $sible;
-					save_config('token');
-					$num = $invi;
-					$ifound = TRUE;
-				}
-			}
-			if($ifound){
-				$toke = cookie();
-				if(empty($toke)){
-					return $dAmn->say("$from: No token, bad pass?",$c);
-				}
-				return $dAmn->say($f ."{$toke}",$c);
-			}
-			if(empty($args[2])){
-				$dAmn->say("$from: Place password in bot window.",$c);
-				print "\nwhat is $username's password?\n";
-				$args[2] = trim(fgets(STDIN));
-			}
-			$config['token']['username']=$args[1];
-			$config['token']['password']=$args[2];
-			$toke = cookie();
-				if(empty($toke)){
-					return $dAmn->say("$from: No token, bad pass?",$c);
-				}
-				return $dAmn->say($f ."{$toke}",$c);
-		}else
-		return $dAmn->say("$from: This is an owner only command.",$c);
+		}else 
+			return $dAmn->say("$from: This is an owner-only command.",$c);				// This could be earlier in the command, but whatever. 
 		break;
-	*/
-}//78 lines for one command. Still overly long. This was even fixed to work with the new storage system.
+	case "atswap":																		// My red-headed stepchild, $atswap. <3 
+		if(empty($argsF)){
+			return $dAmn->say("$from: Please put your username and authtoken to change logins. If you don't know what an authtoken is, don't use this command.",$c);
+		}else	// 7/30/11 below, 7/18/2013 right.										// I'll leave in the following, since I've been mocking that for 5 fucking versions. Haha
+		//Since this command involves authtokens, which I don't imagine you have memorized, no sense in allowing it in the bot window, as you can't copypaste in command prompts.
+		if(empty($args[2])){
+			return $dAmn->say("$from: Username and authtoken required. To login with a password, see {$tr}login. Caution: Do not use in public rooms as this is sensitive info.",$c);
+		}
+		if(strlen($args[2]) !== 32){ 													// Let's make sure that's 32 characters. Otherwise, you'll have to restart the bot.
+			return $dAmn->say("$from: The authtoken must be 32 characters. Try again. If you don't know what one is, don't use this command.",$c);
+		}
+		$config['bot']['username'] = $args[1];											// Let's plug that info into the $config. 
+		$config['bot']['token'] = $args[2];
+		save_config('bot');
+		$dAmn->say("$from: Token accepted. Changing logins, please wait.",$c);				// Let's send that disconnect, baby. 
+		$dAmn->send("disconnect\n".chr(0));
+		break;
+}// END switch. 58 lines (after moving the comments along the side, like the currant version.
 ?>

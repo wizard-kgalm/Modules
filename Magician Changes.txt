@@ -1,0 +1,24 @@
+For this copy of Magician, if you've had any previous update, you've noticed one thing. No cleanup. Just making sure things work. Magician 4.5 has the most changes since the update to 2.0. Now with comments included!
+
+~??token has been rewritten and simplified and still works the same as ever!
+
+~??cookie has been removed.
+
+~??me and ??npmsg has been removed completely, as they're there for input, so it makes more sense for them to be in that module.
+
+~The $config['token'] storage for login and token grabbing has been removed completely.
+
+~??invisistore has been shortened to ??istore.
+
+~$config['invisilogins']['logins'] has been moved to $config['logins']['hidden'] and this update is triggered at start-up.
+
+~??login has been combined with ??token to reduce space, as it does the same thing up to changing accounts. (And moved to token.php)
+
+
+~The storage updates and changes for anyone who may still have the oldest version has been moved to config.php so it triggers on startup instead of on command use.
+
+~All inappropriate variable names have been changed to better match the function they serve.
+
+~Fixed the commands that allowed for the password to be entered into the bot window to only work when an owner triggers it. This is to prevent other people from killing the bot.
+
+~??atswap, authtoken swap (a login change command) has been moved to token.php.
