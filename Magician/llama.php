@@ -51,28 +51,23 @@ switch($args[0]){
 		}
 		$config->df['llamasend']['llamauser'][$username] = $cookie_jar;
 		$config->save_info( "./config/llamasend.df", $config->df['llamasend'] );
-		if( strtolower( $args[0] ) == "rllama" ){
-			//This is the part where we kick out the info to the llama badge sender. This part is for the random llama so it'll just be sending the cookie and password to use.
-			llama( null, $cookie_jar, $password, $username );
-			$dAmn->say( "$from: Random llama sent as $username!", $c );
-		}elseif( strtolower( $args[0] ) == "llama" ) {
-			//This one is for the specified user. It'll kick out the username, cookie, and the password for the account used.
-			llama( $args[1], $cookie_jar, $password, $username );
-			$dAmn->say( "$from: Llama sent to $args[1] as $username!", $c );
-		}elseif( strtolower( $args[0] ) == "rspama" ) {
-			//This is where we'll be kicking out the llama loop. 
-			for( $i = 0; $i <= $loopnum; $i++ ){
+		if( $args[0] !== "rspama" ) {
+			( $args[0] == "llama" ) ? $to = $args[1] : $to = NULL;	// Command specific. We want $to blank for rllama so it goes to random deviant.
+			llama( $to, $cookie_jar, $password, $username );		// Let's kick it out to the llama function.
+			( empty( $to ) ) ? $say = "Random llama sent as $username!" : $say = "Llama sent to {$args[1]} as $username!";
+			$dAmn->say( "$from: {$say}", $c );
+		} else {													// For rspama, we're going to spawn a loop. No more than 77, as this is the limit
+			for( $i = 0; $i <= $loopnum; $i++ ){					// before dA's spamfilter is tripped, blocking you from sending llamas.
 				llama( null, $cookie_jar, $password, $username );
-				//$dAmn->pingpong2();
-				$dAmn->send( "pong\n" . chr( 0 ) );
+				$dAmn->send( "pong\n" . chr( 0 ) );					// We'll need this to prevent the bot from timing out. 
 			}
-			$dAmn->logout( $username, $info );
 			if( file_exists( "./modules/rubix/config.php" ) ) {
 				if( $args[2] !== "todo-mahem" ){
 					parseCommand( "{$tr}hidecoms {$args[2]}", $config->bot['owner'], "!err_plz!", "msg");
 				}
 			}
-			$dAmn->say( "$from: $loopnum llamas sent as $username!", $c );
+			registerChat( "[$c] <{$config->bot['username']}> $from: $loopnum llamas sent as $username!", $c, TRUE );	// For llamabot. I'm getting rid of all
+			//$dAmn->say( "$from: $loopnum llamas sent as $username!", $c );											// spam command related messages. :D
 		}
 	break;
 	case "fullama":
