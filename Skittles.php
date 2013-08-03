@@ -18,34 +18,33 @@ class dAmn_Magician extends extension {
     public $type = EXT_CUSTOM;
 	public $Events;
     function init() {
-
-		$this->addCmd('shank', 'c_shank', 0);
-		$this->addCmd('google', 'c_google', 0);
-		$this->addCmd('llama', 'c_llama', 0);
-		$this->addCmd('rllama', 'c_llama', 0);
-		$this->addCmd('rspama', 'c_llama', 99);
-		$this->addCmd('logins', 'c_logins', 99);
-		$this->addCmd('token', 'c_token', 99);
-		$this->addCmd('login', 'c_token', 99);
-		$this->addCmd('symbols', 'c_symbols', 99);
-		$this->addCmd('sr', 'c_responses', 50);
-		$this->addCmd('r', 'c_cock', 99);
-		$this->addCmd('input', 'c_input', 99);
-		$this->switch_input();
-		$this->addCmd('bzikes', 'c_bZikes', 75);
-		$this->addCmd('me', 'c_me', 75);
-		$this->addCmd('npmsg', 'c_npmsg', 75);
-		$this->addCmd('colors', 'c_colors', 25);
-		$this->addCmd('shout', 'c_shout', 25);
-		$this->addCmd('shouts', 'c_shouts', 25);
-		$this->hook('shout_msg', 'recv_msg');
-		$this->hook('shout_msg', 'recv_action');
-
+		// COMMANDS ARE BELOW HERE.						// BRIEF INFO ON THE COMMANDS COMMENTED BELOW HERE. (lol I just like spamming comments in my own modules now ).
+		$this->addCmd( 'shank'  , 'c_shank'    , 0  );	// $shank. A Magician Original. This one helped me make sure I knew Contra's function system so I could write this.
+		$this->addCmd( 'google' , 'c_google'   , 0  );	// $google is just here so that contra has the ability to do so as well. 
+		$this->addCmd( 'llama'  , 'c_llama'    , 0  );	// $llama. Send a specified user a llama from a specified user on your $logins list.
+		$this->addCmd( 'rllama' , 'c_llama'    , 0  );	// $rllama. Random llama. Send a llama to a random deviant!
+		$this->addCmd( 'rspama' , 'c_llama'    , 99 );	// $rspama. Spam up to 77 llamas to 77 random deviants from one account.
+		$this->addCmd( 'logins' , 'c_logins'   , 99 );	// $logins. Your storage for all of your accounts on the bot. 
+		$this->addCmd( 'token'  , 'c_token'    , 99 );	// $token. Grabs the authtoken for an account. No password needed for stored ones. 
+		$this->addCmd( 'login'  , 'c_token'    , 99 );	// $login. Changes logins on the bot to the provided one. No password needed for stored ones.
+		$this->addCmd( 'symbols', 'c_symbols'  , 99 );	// $symbols. Turns on symbols so your bot speaks with chosen symbols from the charmap.
+		$this->addCmd( 'r'      , 'c_cock'     , 99 );	// $r. Rape. Rape a chatroom! Might remove this one later. lol
+		$this->addCmd( 'input'  , 'c_input'    , 99 );	// $input. Allows use of an input window so you may talk directly from the bot.
+		$this->addCmd( 'bzikes' , 'c_bZikes'   , 75 );	// $bzikes. Gives the bot use of the zikes emote database. ( So messages may be converted from the input window ).
+		$this->addCmd( 'me'     , 'c_me'       , 75 );	// $me. Fast access to /me actions for the input window.
+		$this->addCmd( 'npmsg'  , 'c_npmsg'    , 75 );	// $npmsg. Same as holding shift. Sends a non-parsed message.
+		$this->addCmd( 'colors' , 'c_colors'   , 25 );	// $colors. Check the dAmnColors database for the colors of a specific user (or set your own). No one uses anymore.
+		$this->addCmd( 'shout'  , 'c_shout'    , 25 );	// $shout. RECORDS MESSAGES IN ALL CAPS. When activated, picks a random one to respond to users shouting with.
+		$this->addCmd( 'shouts' , 'c_shouts'   , 25 );	// $shouts. Find a previously shouted message, and get its details. 
 		
+		// EVENTS ARE BELOW HERE.
+		$this->hook('shout_msg', 'recv_msg');
+		$this->hook('shout_msg', 'recv_action');	
+		$this->switch_input();
 		$this->hook('e_input', 'loop');
-
 		$tr = $this->Bot->trigger;
 		
+		// HELPS ARE BELOW HERE.
 		$this->cmdHelp('llama', "{$tr}llama [username] {user2} where username is a specified dA username. This sends the specified username a llama. {user2} is an optional parameter. If specified, the bot will try to send the username a llama from that dA account instead of the bot's.");
 		$this->cmdHelp('rllama', "{$tr}rllama {user} Sends a llama to a random user. {user} is an optional parameter. If specified, the bot will try to send a llama from that dA account instead of the bot's. ");
 		$this->cmdHelp('rspama', "{$tr}rspama # {user} Sends llamas to either a specified number of random deviants or 50. If you provide a number and {user} it'll try and send those random people llamas from that account.");
@@ -60,8 +59,6 @@ class dAmn_Magician extends extension {
 		
 		$this->cmdHelp('token', 'token uses either a username/password combo, or it can use one of the stored logins to return a token for that account. <sup><b><br>'.$tr.'token <i>username (password)</i></b> Leave the password blank to input into the bot window.');
 		
-		//$this->cmdHelp('cookie', 'cookie uses either a username/password combo, or it can use one of the stored logins to return a cookie for that account. <sup><b><br>'.$tr.'cookie <i>username (password)</i></b> Leave the password blank to input into the bot window.');
-		
 		$this->cmdHelp('me', 'Use /me in the input window for actions.');
 		
 		$this->cmdHelp('npmsg', 'Use /npmsg in the input window as the same thing as holding shift when you hit enter.');
@@ -70,8 +67,6 @@ class dAmn_Magician extends extension {
 		
 		$this->cmdHelp('sexy', 'Sexy is a speech module. It responds with a sentence from a list of \'sexy\' responses, to a list of users that you make by adding people with suser add. To use it, just type <b><i>'.$tr.'sexy on/off</i></b>.');
 		
-		$this->cmdHelp('sr', 'sr is the command that adds responses to the sexy response list. <sup><br><b>'.$tr.'sr add <i>response</i></b> adds a response to the list.<br><b>'.$tr.'sr del <i>NUMBER</i></b> deletes a response, based on the numeric ID of that response.<br><b>'.$tr.'sr list </b> displays the list of responses.</sup>');
-		
 		$this->cmdHelp('bzikes', 'bZikes is the implementing of Zikes on PHP bots, so that their inputs can take advantage of the Zikes emotes. It is customizable. To toggle whether or not it\'s on and being used by input, type <b>'.$tr.'bzikes on/off</b><sup><br><b>'.$tr.'bzikes refresh</b> Tells the bot to check the list and download the list again. You can use this to keep it up to date if you know emotes have been added to the public list.<br><b>'.$tr.'bzikes check <i>:code:</i></b> checks the list of emotes for one using that code.</sup>');
 		
 		$this->cmdHelp('input', 'Input is the ability to control the bot from another cmd Prompt window, without the OWNER actually needing to be on dAmn. To enable it, type '.$tr.'input on/off. The prompt that allows input was provided. When using the window, type lt; for <, gt; for >, %v for |, and %a for &. If you\'re just using say, type the room you want the bot to talk in first, then your message. You don\'t need to include the room in the message unless you\'re changing what room the bot is talking in. To use another command, type "/ [cmd name] [other]".');
@@ -79,306 +74,217 @@ class dAmn_Magician extends extension {
 		$this->cmdHelp('spell', 'Spell is the same as the Dante command. To use, just type '.$tr.'spell <i>word</i>.');
 		
 		$this->cmdHelp('colors', 'Colors checks the dAmn colors list for the colors of the provided user. It can also set/change colors or create a dAmnColors account.<sup><br><b>'.$tr.'colors (check) <i>username</i></b> checks the colors of the provided user. The check parameter is optional.<br><b>'.$tr.'colors change/set <i>username password color1 color2</i></b> Changes the colors of the username given. The password is your dAmnColors Password, not your dA. If you leave the password, color1, and color2 blank, you can do the rest in the bot window. You can include the password and just do the colors from the window, and you can leave only the second color blank and put in to the window. You must provide 2 colors, and one must be different than the ones you already have.');
-		if(file_exists('./storage/logins.cf')){
-			$adding = include './storage/logins.cf';
-		
-			if(isset($adding['login'][0])){
-				foreach($adding['login'] as $logins => $list){
-					$adding['login'][$adding['login'][$logins][0]] = $adding['login'][$logins][1];
-					unset($adding['login'][$logins]);
-					sort($adding['login']);
-					save_config('./storage/logins.cf',$adding);
-				}
-			}
-			if(isset($adding['login'][1])){
-				foreach($adding['login'] as $logins => $list){
-					$adding['login'][$adding['login'][$logins][0]] = $adding['login'][$logins][1];
-					unset($adding['login'][$logins]);
-					sort($adding['login']);
-					save_config('./storage/logins.cf',$adding);
-				}
-			}
+	
+		if( file_exists( "./storage/bzikes.cf" ) ){										// No more logins conversions.. No one could possibly have that version.
+			$ef = include "./stroage/bzikes.cf";
 		}
-		if(file_exists("./storage/logins.cf")){
-			$lg = include "./storage/logins.cf";
-			if(!isset($lg['encoded'])){
-				foreach($lg['login'] as $who => $wat){
-					$lg['login'][$who] = base64_encode($wat);
-				}
-				$lg['encoded'] = TRUE;
-				save_config("./storage/logins.cf",$lg);
-				echo "Logins passwords encoded c:".chr(10);
+		if( empty( $ef ) ) {
+			$newfile = unserialize( file_get_contents( 'http://www.thezikes.org/publicemotes.php?format=php&ip=12.234.156.78' ) );
+			foreach( $newfile as $code => $emotes ) {									// Now to sort the list down. 
+				$ef['bzikes'][$code] = $emotes['devid'];
 			}
-		}
-				
-		if(file_exists('./storage/bzikes.cf')){
-			$checker = include './storage/bzikes.cf';
-		
-			if(!empty($checker['codes'])){
-				$adding = unserialize(file_get_contents('http://www.thezikes.org/publicemotes.php?format=php&ip=12.234.156.78'));
-				save_config('./storage/bzikes.cf',$adding);
-				foreach($adding as $test => $emotes){
-					$adding[$test] = $emotes['devid'];
-				}
-				$adding['status'] = TRUE;
-				save_config('./storage/bzikes.cf',$adding);
-			}
+			$stat['status'] = TRUE;														// Automatic start up. Should always be on.
+			save_config( "./storage/bzikes.cf", $ef['bzikes'] );
+			save_config( "./storage/bzikes2.cf", $stat );			
 		}
 	}
 	
-	function c_llama($ns, $from, $message, $target) {
-		$person = args($message, 1);
-		$spamnum = args($message, 1);
-		$sending = args($message, 0);
-		$person2 = args($message, 2);
-		$tr = $this->Bot->trigger;
-		if(!empty($person2)){
-			$person2 = strtolower( $person2 );
+	function c_llama( $ns, $from, $message, $target ) {									// Sweet llama command. Should almost mirror Magician when I'm done.
+		$person  = args( $message, 1 );	// $person is our target. Who we'll be sending the llama to.
+		$loops   = args( $message, 1 );	// $loops is for $rspama. The number of loops we'll attempt.
+		$com     = args( $message, 0 );	// $com is obviously the command. 
+		$person2 = args( $message, 2 );	// $person2 is the person sending the llama. We'll be working this out below. :D
+		$tr      = $this->Bot->trigger;
+		if( !empty( $person2 ) ){
+			$person2 = strtolower( $person2 );											// Always strtolower. Always.
 		}
-		//Let's just load a all the config stuff.. we'll be using that.
-		if(file_exists('./storage/config.cf')){
-			$pass = include './storage/config.cf';
-		}
-		if(file_exists('./storage/logins.cf')){
-			$logins = include './storage/logins.cf';
-		}
-		if(file_exists('./storage/llama.cf')){
-			$Llama = include './storage/llama.cf';
-		}
-		switch($sending){
-			case "rspama":
-			case "rllama":
+		switch ( $com ) {
 			case "llama":
-				if(strtolower($sending) == "llama"){
-					if( empty ( $person ) ){
-						return $this->dAmn->say($ns, "{$from}: You must specify your llama recipient. Use rllama to send a random person one.");
+			case "rspama": 
+				if( empty( $person2 ) ) {												// This is very convoluted. lol 
+					( $com != "rspama" ) ? $person2 = strtolower( $this->bot->username ) : ( ( is_numeric( $loops ) ) ? $person2 = strtolower( $this->bot->username ) : $person2 = strtolower( $loops ) );
+				}
+				if( $com == "rspama" ) {
+					if( is_numeric( $loops ) ){
+						( $loops >= 77 ) ? $loops = 77 : $loops = $loops;
 					}
-				}
-				//For random llamas if you specified a username, we'll try to use that dA account for the llama sending process.
-				if($sending == "rllama" && isset($person)){
-					$person2 = $person;
-				}
-				//Setting up our llama looper.. We max out at 77 so.. That's where we'll force the loop to end.
-				if($sending == "rspama"){
-					//Default loop is set at 50. We assume if $args[1] isn't a number that it's the account you want to send llamas from.
-					if(!is_numeric($spamnum)){
-						$loopnum = 50;
-						$person2 = $spamnum;
+				} $llu = substr( $person2, 0, 3 ) ."llama";								// We want our llama file so we can check for previously sent llamas.
+				if( $com == "llama" && file_exists( "./storage/{$llu}.cf" ) ) {
+					$check = include "./storage/{$llu}.cf";
+					if( isset( $check[$person2][$person] ) ) {
+						return $this->dAmn->say( $ns, "$from: {$person2} cannot send any more llamas to {$person}" );
 					}
-					if(empty($spamnum)){
-						$loopnum = 50;
-					}
-					//If a number was supplied AND you supplied a second argument, we'll try to use that for llama sending.
-					elseif(is_numeric($spamnum) && $spamnum <= 77){
-						$loopnum = $spamnum;
-					}else $loopnum = 77;
-				}
-				//Here's where we check to see if the username provided is in your logins list.. assuming you have one, of course.
-				if( isset( $person2 ) && isset( $logins['login'][strtolower( $person2 )] ) ){
-					$username = $person2;
-					$password = base64_decode($logins['login'][$person2]);
-				
-				//UPDATE: Since Contra no longer uses a stored password, oAuth would make this part useless. Going to rig this part for engaging only on older bots. :)
-				}elseif( !empty( $pass['info']['password'] ) && empty( $password ) ){
-					//IF you provided an account name and it was not found, we'll be using the bot's account. 
-					$username = $this->Bot->username;
-					$password = $pass['info']['password'];
-				}
-				if( empty( $password ) ){
-					return $this->dAmn->say( $ns, "$from: $person2 is not a stored account, and we cannot proceed with llama. Please use an account that's on the logins list.<br>----<br><sup>To see a list of your stored accounts, use <i>{$tr}logins list</i>." );
-				}
-				//Checking to see if $username has already sent $person a llama before.. no sense in proceeding if they have, each person can only send a llama once to another user.
-				if(isset($Llama['list'][strtolower( $username )][strtolower($person)])){
-					return $this->dAmn->say($ns, "$from: $username can't send another llama to $person.");
-				}
-				//Method to get the cookie! Yeah! :D
-				//Our first job is to open an SSL connection with our host.
-				$socket = fsockopen("ssl://www.deviantart.com", 443);
-				// If we didn't manage that, we need to exit!
-				if($socket === false) {
-					return array(
-						'status' => 2,
-						'error' => 'Could not open an internet connection'
-					);
-				}
-				// Fill up the form payload
-				$POST = '&username='.urlencode($username);
-				$POST.= '&password='.urlencode($password);
-				$POST.= '&remember_me=1';
-				//echo "We are at part 1.".chr(10);
-				// And now we send our header and post data and retrieve the response.
-				$response = $this->dAmn->send_headers(
-					$socket,
-					"www.deviantart.com",
-					"/users/login",
-					"http://www.deviantart.com/users/rockedout",
-					$POST
-				);
-				// Now that we have our data, we can close the socket.
-				fclose ($socket);
-				// And now we do the normal stuff, like checking if the response was empty or not.
-				if(empty($response))
-				return array(
-						'status' => 3,
-						'error' => 'No response returned from the server'
-				);
-				if(stripos($response, 'set-cookie') === false)
-				return array(
-					'status' => 4,
-					'error' => 'No cookie returned'
-				);
-				// Grab the cookies from the header
-				$response=explode("\r\n", $response);
-				$cookie_jar = array();
-				foreach ($response as $line)
-					if (strpos($line, "Set-Cookie:")!== false)
-						$cookie_jar[] = substr($line, 12, strpos($line, "; ")-12);
-					if(strtolower($sending) == "rllama"){
-						//This is the part where we kick out all the necessary info to send a random llama out. Username is included for record keeping purposes. You'll see below.
-						$this->llama(null, $cookie_jar, $password, $username);
-						$this->dAmn->say($ns, "$from: Random llama sent as $username!");
-					}if( strtolower($sending) == "llama"){
-						//As above, this is for the llama sent to a specified user. Username is included for record keeping purposes.
-						$this->llama($person, $cookie_jar, $password, $username);
-						$this->dAmn->say($ns, "$from: Llama sent to $person as $username!");
-					}if( $sending == "rspama"){
-						//Now to loop our llama sender. This will probably lag a bit. 
-						for($i = 0; $i <= $loopnum; $i++){
-							$this->llama(null, $cookie_jar, $password, $username);
-							$this->dAmn->send( "pong\n" . chr( 0 ) );
-						}
-						$this->dAmn->say($ns, "$from: $loopnum Llamas sent as $username!");
-					}
+				}							
 			break;
+			case "rllama":
+				( isset( $person ) ) ? $person2 = strtolower( $person ) : $person2 = strtolower( $this->bot->username );
+			break;
+		}																				// Now that we straightened all of that out.. let's check the logins.
+		if( file_exists( "./storage/logins.cf" ) ) {
+			$logins = include "./storage/logins.cf";
 		}
-		
-	}
+		if( file_exists( "./storage/session.cf" ) ) {									// This is where we store our cookie from the previous run. 
+			$reuse = include "./storage/session.cf";									// We want this so the bot isn't logging in hundreds of times
+		}																				// Just to send llamas (or do anything else cookie related ).
+		if( !empty( $logins ) ) {														// Because you might not have one, we need this checkpoint.
+			if( isset( $logins['login'][$person2] ) ){									// Let's set these variables here for the cookie grabbing.
+				$username = $person2;
+				$password = base64_decode( $logins['login'][$person2] );
+			}
+			if( empty( $username ) ){
+				if( isset( $logins['login'][strtolower( $this->bot->username ) ] ) ) {
+					$username = strtolower( $this->bot->username );
+					$password = base64_decode( $logins['login'][strtolower( $this->bot->username ) ] ); 
+					echo "We couldn't find that name on the list. Switching to bot's account.\n";
+				} else {
+					return $this->dAmn->say( $ns, "$from: {$person[2]} is not a stored login. In order to use llama, you must set up the logins list and store the accounts." );
+				}
+			}
+		}
+		if( !empty( $reuse ) ) {														// Here's where we test the former session. 
+			if( isset( $reuse['users'][$username] ) ) {
+				$cookie_jar = $reuse['users'][$username];								// Set our cookie_jar.
+				$response = $this->dAmn->send_headers( fsockopen( "tcp://www.deviantart.com", 80 ), "www.deviantart.com", "/", "", "", $cookie_jar );
+				$response = explode( "\r\n", $response );
+				$jar2 = array();
+				foreach( $response as $line ) { 
+					if( strpos( $line, "Set-Cookie:" ) !== FALSE ) {
+						$jar2[] = substr( $line, 12, strpos( $line, "; " ) -12 );
+					}
+				}
+				$taco = explode( ";", urldecode( $jar2[0] ) );							// Make sure that the cookie response includes the username.
+				if( stristr( $taco[1], "\"username\":\"\"" ) ) {						// If it does, that session ended. We need a new cookie. 
+					echo "That session ended, let's grab a new one. \n";
+					$cookie_jar = NULL;
+				}
+			}
+		}
+		if( empty( $cookie_jar ) || $cookie_jar === NULL ) {							// Our cookie expired. :( Grab a new one!
+			$cookie_jar = $this->get_cookie( $username, $password );
+			if( isset( $cookie_jar['error'] ) ){
+				return $this->dAmn->say( $ns, "$from: {$cookie_jar['error']}" ); 		// Oops, something went wrong. :( 
+			}
+			$reuse['users'][$username] = $cookie_jar; 									// Let's save that session.
+			save_config( "./storage/session.cf", $reuse );
+		}																				// We now have our cookie.
+		if( $com != "rspama" ) {
+			( $com = "llama" ) ? $to = $person : $to = NULL;
+			$this->llama( $to, $cookie_jar, $password, $username );						// Let's kick it out to the llama function.
+			( empty( $to ) ) ? $say = "Random llama sent as $username!" : $say = "Llama sent to {$args[1]} as $username!";
+			$this->dAmn->say( $ns, "$from: {$say}" );
+		} else {
+			for( $i = 0; $i < $loop; $i++ ) {
+				$this->llama( NULL, $cookie_jar, $password, $username );
+			}
+			$this->dAmn->say( $ns, "$from: {$loop} llamas sent as $username!" );
+		}
+	} 		// END c_llama. Down to 90 Lines from.. 126. Nice improvement in functionality too. (Exported cookie grabber, imported use of previous cookie).
 	
-	function llama($person, $cookie_jar, $password, $username){
-		//We start by loading the config info.. 
-		$tr = $this->Bot->trigger;
-		if(file_exists('./storage/config.cf')){
-			$pass = include './storage/config.cf';
+	function llama( $person, $cookie_jar, $password, $username ){	// Here's our llama function. For to be sending badges, we'll need this thing's a-game.
+		$tr = $this->Bot->trigger;														// Let's load our shit.. 
+		$llu = substr( $username, 0, 3 ) . "llama";										// Personal llama files. Otherwise, a centralized one fills up too quickly.
+		if( file_exists( "./storage/{$llu}.cf" ) ) { 
+			$file = include "./storage/{$llu}.cf";
 		}
-		if(file_exists('./storage/llama.cf')){
-			$Llama = include './storage/llama.cf';
-		}
-		//If we have a provided username, we'll be visiting their page to steal some required info.
-		if(isset($person)){
-			$devpage = @file_get_contents("http://".strtolower($person).".deviantart.com/");
-		}else{
-			//If we're going random, We'll be going to a random deviant's page for this info.
-			$devpage = @file_get_contents('http://www.deviantart.com/random/deviant');
-			preg_match("/gmi-name=\"(.*)\"/Ums", $devpage, $matches);
+		if( isset( $person ) ) {														// We have a recipient lined up. Let's do it, son. 
+			$devpage = @file_get_contents( "http://" . strtolower( $person ) . ".deviantart.com/" );	
+		} else {																		// We have no recipient. to /random/deviant!
+			$devpage = @file_get_contents( 'http://www.deviantart.com/random/deviant' );
+			preg_match( "/gmi-name=\"(.*)\"/Ums", $devpage, $matches );					// Look through the page for their username..
 			$person = $matches[1];
-		}
-		//Let's just mark the date and time we sent this person a llama down on a list. We're gonna keep track of that by username.
-		$Llama['list'][strtolower($username)][strtolower($person)] = date('d-m-y', time());
-		//So.. $username is the account being used for the llama sending, $person is the person we're sending the llama to.
-		save_config('./storage/llama.cf',$Llama);
-		//Now then, hunting their page for their user id.
-		preg_match("/gmi-gruser_id=\"(.*)\"/Ums", $devpage, $matched);
-		$dev = $matched[1];
-		$devpage2 = urlencode("http://{$person}.deviantart.com/");
-		//Assuming we got the ID, let's send all of this so we get to the llama giving.
-		$llamapage = $this->dAmn->send_headers(
-			fsockopen("tcp://www.deviantart.com", 80),
+			if( isset( $file[$llu][$username][strtolower( $person )] ) ) {
+				return $this->llama( NULL, $cookie_jar, $password, $username );			// ROUND TWO. Let's keep trying, we want the random llama to go out.
+			}
+		}																				//ANOTHER UPDATE BROKE THE MODULE. Fixed, v2.0.
+		$file[$llu][$username][strtolower( $person )] = date( 'd-m-y', time() ); 		// Our file will be first 3 letters + llama of $username.
+		save_info( "./storage/{$llu}.df", $file[$llu] );								// Now, since I've fucked this up so many times.. 
+		preg_match( "/gmi-gruser_id=\"(.*)\"/Ums", $devpage, $matches );				// We're going to adjust at the end as well to check the response
+		$dev = $matches[1];																// to see if we've sent a llama to $person.
+		$llamapage = $this->dAmn->send_headers(											// Let's spoof the first time so we can grab the required IDs. 
+			fsockopen( "ssl://www.deviantart.com", 443 ),
 			"www.deviantart.com",
-			"/modal/badge/give?badgetype=llama&to_user={$dev}&trade_id=0&referrer={$devpage2}",
-			"http://www.deviantart.com",
-			null,
+			"/modal/badge/give?badgetype=llama",
+			"https://www.deviantart.com",
+			"&to_user={$dev}&trade_id=0&referrer=" . urlencode( "http://{$person}.deviantart.com/" ),
 			$cookie_jar
-			);
-		//If we're successful in sending that, we'll be grabbing the token for the transaction.
-		preg_match("/name=\"token\" value=\"(.*)\"/Ums", $llamapage, $matches2);
-		preg_match("/name=\"validate_token\" value=\"(.*)\"/Ums", $llamapage, $matches3);
-		preg_match("/name=\"validate_key\" value=\"(.*)\"/Ums", $llamapage, $matches4);
-		$token = $matches2[1];
+		);																				// Now, let's match that info. 
+		preg_match( "/name=\"validate_token\" value=\"([0-9a-zA-Z\W\- ]+)\"/Ums", $llamapage, $matches3 );
+		preg_match( "/name=\"validate_key\" value=\"(.*)\"/Ums"  , $llamapage, $matches4 );
 		$vToken = $matches3[1];
-		$vKey = $matches4[1];
-		//Let's set up the final portion of the required info so we can send the badge. 
-		$toSend = "&quantity=1&userpass={$password}&tos=1&_toggle_tos=0&password_remembered=1&_toggle_password_remembered=0&badgetype=llama&to_user={$dev}&token={$token}&validate_token={$vToken}&validate_key={$vKey}";
-		//Finally, we send out the llama badge with all the required info.
+		$vKey   = $matches4[1];															// Setting up our header for actually sending the badge..
+		$toSend = 'subdomain=www&referrer=&quantity=1&userpass='.$password.'&tos=1&_toggle_tos=0&password_remembered=1&_toggle_password_remembered=0&badgetype=llama&to_user='.$dev.="&quantity=1&trade_id=0&validate_token=".$vToken."&validate_key=".$vKey."&referrer=" . urlencode( "http://{$person}.deviantart.com/" );
 		$e = $this->dAmn->send_headers(
-			fsockopen("tcp://www.deviantart.com", 80),
+			fsockopen( "ssl://www.deviantart.com", 443 ),
 			"www.deviantart.com",
-			"/modal/badge/process_trade?",
-			"http://www.deviantart.com",
+			"/modal/badge/process_trade",
+			"https://www.deviantart.com",
 			$toSend,
 			$cookie_jar
-			);
-			//Voila! If all the login info was correct, check your llama list for the most recent person and go to their page to see that you sent the llama. Have fun with that.
+		);
+		$checker = "/\<li class=\"field_error\" rel=\"quantity\"\>You cannot give any more llama badges to/Ums";
+		if( preg_match_all( $checker, $e, $matches ) !== 0 && $person === NULL ) { 
+			echo "Oh shit, we've sent a llama to them before. Let's try again.\n";
+			return llama( NULL, $cookie_jar, $password, $username );
+		}																				// Llama sent, if all of this works. Otherwise, suck a dick, stupid function. lol
 	}
+} // END llama. 50 lines.
 
 		
-	function c_shank($ns, $from, $message, $target) {
-		$tg = args($message, 1);
+	function c_shank( $ns, $from, $message, $target ) {
+		$tg = args( $message, 1 );
 		$tr = $this->Bot->trigger;
-		$shanks = array(':stab: <b> >:C </b>',':stab: <b>D:< </b>',':thumb95624834:<b> >:C </b>',':thumb95624834: <b> D:< </b>',); //Set up the response list
-		$shanking = $shanks[array_rand($shanks)]; //randomize the response list so it's not just one standard one
-		if(empty($tg)){
-			return $this->dAmn->say($ns,$from.": ". $shanking); //If you don't give someone to shank, it just shanks you instead :D
-		}else
-		foreach($this->user->list[100] as $mem => $k) { 					
-			if(strtolower($k)==strtolower($from)) {							
-				$cando = TRUE;
-				$mj = $k;															
+		$shanks = array( ':stab:',':thumb95624834:', ':thumb167346607:', ':thumb155896667:', ':thumb179198418:', ':thumb126635871:', );
+		$emote  = array( ' <b>>:C</b>', ' <b>D:<', ' >:&zwj;O', );						// Set up the response list
+		$shanking = $shanks[array_rand( $shanks )] . $emote[array_rand( $emote )];	 	// Randomize the response list so it's not just one standard one
+		if( empty( $tg ) ){
+			return $this->dAmn->say( $ns, "$from: {$shanking}" ); 						// If you don't give someone to shank, it just shanks you instead :D
+		} else
+		if( in_array( $from, $this->user->list[100] ) ) {
+			return $this->dAmn->say( $ns, "{$tg}: {$shanking}" ); 						// You're an owner? Shank away, son. 
+		} else 
+			if( in_array( $tg, $this->user->list[100] ) ) {
+				return $this->dAmn->say( $ns, "$from: {$tg} cannot be shanked! :noes:");//No touchy the owner. :C
 			}
-		}
-		if ($cando){
-			return $this->dAmn->say($ns,$tg.": ". $shanking); 
-			//If you're the owner, it just shanks who or whatever you tell it to. If not, it runs a filter stopping you from shanking the owner or bot. SAFETY! ;O
-		}else 
-			$noshank = FALSE;
-			foreach($this->user->list[100] as $mem => $k) { 
-				if(strtolower($k)==strtolower($tg)) {	
-					$noshank = TRUE;
-				}
+			if ( strtolower( $tg ) == strtolower( $this->Bot->username ) ) {
+				return $this->dAmn->say($ns, "$from: {$tg} cannot be shanked! :noes:" );// No touchy the bot. :C
 			}
-			if ($noshank) {
-				return $this->dAmn->say($ns, $from.": ".$tg." cannot be shanked! :noes:");    //No touchy the owner. :C
-			}else
-			if (strtolower($tg) == strtolower($this->Bot->username)) {
-				return $this->dAmn->say($ns, $from.": ".$tg." cannot be shanked! :noes:"); //No touchy the bot. :C
-			}else
-		return $this->dAmn->say($ns, $tg.": " .$shanking);	//Shanking time! C:
-		}
-	
-	
-	function c_google($ns,$from,$message,$target){
-		$wat = args($message,1, true);
-		$watt = args($message,1);
-		$tr = $this->Bot->trigger;
-		if(substr($watt,0,1)=='#' && is_numeric(str_replace('#','',$watt))){
-			$lim=str_replace('#','',$watt);
-			if($lim>4){
-				$lim=4;
+		$this->dAmn->say( $ns, "{$tg}: {$shanking}" );									//Shanking time! C:
+	}
+		
+	function c_google( $ns, $from, $message, $target ){
+		$wat  = args( $message, 1, true );
+		$watt = args( $message, 1 );
+		$tr   = $this->Bot->trigger; 
+		if( substr( $watt, 0, 1 ) == '#' && is_numeric( str_replace( '#', '', $watt ) ) ) {
+			$lim = str_replace( '#', '', $watt );
+			if( $lim > 4 ) {
+				$lim = 4;
 			}
-			$quer=$wat;
-		}else{
-			$lim=3;
-			$quer=$wat;
+			$quer = str_replace( " ", "+", $watt );
+		} else {
+			$lim = 3;
+			$quer = str_replace( " ", "+", $watt );
 		}
-		if($quer){
-			$url="http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=".$quer;
-			$raw=file_get_contents($url);
-			$json = json_decode($raw);
-			if($json->responseStatus==200){
-				$i=0;
-				$say="<ul>";
+		if( $quer ) {
+			$url  = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=" . $quer;
+			$raw  = file_get_contents( $url );
+			$json = json_decode( $raw );
+			if( $json->responseStatus == 200){
+				$i = 0;
+				$say = "<ul>";
 				do{
-					if($json->responseData->results[$i]->titleNoFormatting){
-						$say.="<li><b><a href=\"".$json->responseData->results[$i]->url."\">".$json->responseData->results[$i]->titleNoFormatting."</a></b><br/><sub>".$json->responseData->results[$i]->content."<br/>".$json->responseData->results[$i]->visibleUrl." | <a href=\"".$json->responseData->results[$i]->cacheUrl."\">[Cache]</a></sub></li>";
+					if( $json->responseData->results[$i]->titleNoFormatting ) {
+						$say .= "<li><b><a href=\"" . $json->responseData->results[$i]->url . "\">" . $json->responseData->results[$i]->titleNoFormatting . "</a></b><br/><sub>" . $json->responseData->results[$i]->content . "<br/>" . $json->responseData->results[$i]->visibleUrl. " | <a href=\"" . $json->responseData->results[$i]->cacheUrl . "\">[Cache]</a></sub></li>";
 						$i++;
 					}
-				}while($i!=$lim);
+				} while( $i != $lim );
 			}else{
-				$say="fail: ".$json->responseDetails;
+				$say = "fail: " . $json->responseDetails;
 			}
-		}else{
-			$say="$from, I need at least one word to search.";
+		} else {
+			$say = "$from, I need at least one word to search.";
 		}
-		$this->dAmn->say($ns,$say);
+		$this->dAmn->say( $ns, $say );
 	}
 	
 	function c_logins($ns, $from, $message, $target){
@@ -908,88 +814,84 @@ class dAmn_Magician extends extension {
 					
 
 
-	function token ($username, $password) {
-	// Method to get the cookie! Yeah! :D       
-		// Our first job is to open an SSL connection with our host.
-		$socket = fsockopen("ssl://www.deviantart.com", 443);
-		// If we didn't manage that, we need to exit!
-		if($socket === false) {
-		return array(
+	function getCookie( $username, $password, $x = FALSE ) {
+		if( empty( $password ) ) {
+			return FALSE;
+		}																				// Method to get the cookie! Yeah! :D
+		$socket = fsockopen( "ssl://www.deviantart.com", 443 );							// Our first job is to open an SSL connection with our host.
+		if( $socket === false ) {														// No connection. Return error!
+			return array(
 				'status' => 2,
-				'error' => 'Could not open an internet connection.');
+				'error' => 'Could not open an internet connection'
+			);
 		}
-		// Fill up the form payload
-		$POST = '&username='.urlencode($username);
-		$POST.= '&password='.urlencode($password);
-		$POST.= '&remember_me=1';
-		// And now we send our header and post data and retrieve the response.
-		$response = $this->dAmn->send_headers(
+		$POST  = '&username='.urlencode( strtolower( $username ) );						// Fill up the form payload..
+		$POST .= '&password='.urlencode( $password );
+		$POST .= '&remember_me=1';
+		$response = $this->send_headers(												// Send our headers and post data..
 			$socket,
 			"www.deviantart.com",
 			"/users/login",
 			"http://www.deviantart.com/users/rockedout",
 			$POST
 		);
-		// Now that we have our data, we can close the socket.
-		fclose ($socket);
-		//And now we do the normal stuff, like checking if the response was empty or not.
-		if(empty($response))
-		return array(
+		fclose( $socket );																// We have our data. Close the socket.
+		if( empty( $response ) ) {														// Let's make sure we actually have a response.
+			return array(																// If we don't, return the error!
 				'status' => 3,
-				'error' => 'No response returned from the server.'
-		);
-		if(stripos($response, 'set-cookie') === false)
-		return array(
-				'status' => 4,
-				'error' => 'No cookie returned.'
+				'error' => 'No response returned from the server'
 			);
-		// Grab the cookies from the header
-		$response=explode("\r\n", $response);
-		$cookie_jar = array();
-		foreach ($response as $line)
-			if (strpos($line, "Set-Cookie:")!== false)
-				$cookie_jar[] = substr($line, 12, strpos($line, "; ")-12);
-
-		// Using these cookies, we're gonna go to chat.deviantart.com and get
-		// our authtoken from the dAmn client.
-		if (($socket = @fsockopen("ssl://www.deviantart.com", 443)) == false)
-			 return array(
-				'status' => 2,
-				'error' => 'Could not open an internet connection.');
-
-		$response = $this->dAmn->send_headers(
-			$socket,
-			"chat.deviantart.com",
-			"/chat/Botdom",
-			"http://chat.deviantart.com",
-			null,
-			$cookie_jar
-		);
-		// Now search for the authtoken in the response
-		$cookie = null;
-		if (($pos = strpos($response, "dAmn_Login( ")) !== false)
-		{
-			$response = substr($response, $pos+12);
-			$cookie = substr($response, strpos($response, "\", ")+4, 32);
+		}		
+		if( stripos( $response, 'set-cookie' ) === false ) {							// No cookie in the response, return error!
+			return array(
+				'status' => 4,
+				'error' => 'No cookie returned'
+			);
 		}
-		else //$dAmn->say($response ,"#randwewt");
-		return array(
-			'status' => 4,
-			'error' => 'No authtoken found in dAmn client.'
-		);
-						  
-		// Because errors still happen, we need to make sure we now have an array!
-		if(!$cookie)
-		return array(
+		$response = explode( "\r\n", $response );										// Grab the cookie from our response.
+		$cookie_jar = array();
+		foreach ( $response as $line ) {
+			if ( strpos( $line, "Set-Cookie:" ) !== false ) {
+				$cookie_jar[] = substr( $line, 12, strpos( $line, "; " ) -12 );
+			}
+		}
+		$test = urldecode( $cookie_jar[0] );
+		if( stripos( $test, strtolower( $username ) ) === false ) {						// No username is in there, it's a generic cookie.
+			return array(
 				'status' => 5,
-				'error' => 'Malformed cookie returned.'
-		);
-		// We got a valid cookie!
-		return $cookie;
+				'error' => 'Login failed, bad pass?'
+			);
+		}
+		if( $x ) {																		// We only want the authtoken. Let's use our cookie to get that.
+			$response = $this->send_headers(											// Go to dAmn for that info.
+				fsockopen( "ssl://www.deviantart.com", 443 ),
+				"chat.deviantart.com",
+				"/chat/Botdom",
+				"http://chat.deviantart.com",
+				null,
+				$cookie_jar
+			);
+			$cookie = null;
+			if( ( $pos = strpos( $response, "dAmn_Login( ") ) !== false ){				// Search for the token in our response.
+				$response = substr( $response, $pos + 12 );
+				$cookie   = substr( $response, strpos( $response, "\", " ) + 4, 32 );
+			}else{ 
+				return array(															// No token. You might be dAmnBanned, or you need to verify your email. Oops.
+					'status' => 6,
+					'error' => 'No authtoken found in dAmn client.'
+				);
+			}
+			if( !$cookie ){																// Apparently, it returned a bad authtoken. ( Not sure how that would happen ).
+				return array(
+					'status' => 5,
+					'error' => 'Malformed cookie returned.'
+				);
+			}
+			return $cookie;																// Only wanted the token here. Rreturn said token.
+		}
+		return $cookie_jar;																// And we're returning the cookie jar, full of delicious cookie.
 	}
 
 } 
-
-		
-
-new dAmn_Magician($core);
+new dAmn_Magician( $core );	// So far, 997 lines. Let's aim for under 900! ( 896 AND DROPPING ) 100 lines trimmed from llama and shank.
+?>
