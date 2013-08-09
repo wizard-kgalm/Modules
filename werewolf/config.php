@@ -12,7 +12,7 @@ $modules[$m] = new Module($m,1);
 //Deactivated on startop
 //$modules[$m] = new Module($m,0); //Uncomment to use this option and then comment out the one above.
 $modules[$m]->setInfo(__FILE__); //NO TOUCHY or file will not load properly
-$vidiot = "villageidiot"; $gm = "gamemaster"; $aa = "autoassign";
+$vidiot = "villageidiot"; $gm = "gamemaster"; $aa = "autoassign"; $cr = "confirmrole";
 
 /* COMMANDS BELOW HERE. */
 // Werewolf File, basic commands.
@@ -21,7 +21,8 @@ $modules[$m]->addCmd( 'unplay'    , 'werewolf'  , 0, 1 );	// $unplay removes you
 $modules[$m]->addCmd( 'townie'    , 'werewolf'  , 0, 1 );	// $townie gives you a description of the townie role.
 $modules[$m]->addCmd( 'vidiot'    , 'werewolf'  , 0, 1 );	// $vidiot gives you a description of the village idiot, and allows the game master to turn it on or off.
 $modules[$m]->addCmd( $vidiot     , 'werewolf'  , 0, 1 );	// $villageidiot is an alias of $vidiot, and gives you a description of the role.
-$modules[$m]->addCmd( 'crole'     , 'werewolf'  , 0, 1 );	// $crole is confirm role. This allows the bot to know if everyone has confirmed learning their role.
+$modules[$m]->addCmd( 'rconfirm'  , 'werewolf'  , 0, 1 );	// $rconfirm is confirm role. This allows the bot to know if everyone has confirmed learning their role.
+$modules[$m]->addCmd( $cr         , 'werewolf'  , 0, 1 );	// $confirmrole is an alias of $rconfirm, and directs to the same command.
 $modules[$m]->addCmd( 'mute'      , 'werewolf'  , 0, 1 );	// $mute allows the GameMaster to mute the Players. ( Manually, as the bot does it automatically at sunset ).
 $modules[$m]->addCmd( 'unmute'    , 'werewolf'  , 0, 1 );	// $unmute allows the GameMaster to unmute the players, which is done automatically at sunrise.
 $modules[$m]->addCmd( 'gm'        , 'werewolf'  , 0, 1 );	// $gm allows the first player to use it to become the GameMaster.
@@ -43,13 +44,13 @@ $modules[$m]->addCmd( 'end'       , 'gm'        , 0, 1 );	// $end allows the Gam
 $modules[$m]->addCmd( 'witch'     , 'witch'     , 0, 1 );	// $witch gives a description of the witch role.
 $modules[$m]->addCmd( 'todie'     , 'witch'     , 0, 1 );	// $todie tells the witch who the wolves have elected to kill.
 $modules[$m]->addCmd( 'saves'     , 'witch'     , 0, 1 );	// $saves allows the Witch the opportunity to save who the wolves are going to kill, once per game.
-$modules[$m]->addCmd( 'wkill'     , 'witch'     , 0, 1 );	// $wkill allows the Witch to kill a single player ( usually a suspected wolf ), once per game.
+$modules[$m]->addCmd( 'kills'     , 'witch'     , 0, 1 );	// $wkill allows the Witch to kill a single player ( usually a suspected wolf ), once per game.
 // Oracle file, Oracle commands.
 $modules[$m]->addCmd( 'oracle'    , 'oracle'    , 0, 1 );	// $oracle gives a description of the Oracle role.
 $modules[$m]->addCmd( 'seek'      , 'oracle'    , 0, 1 );	// $seek allows the oracle a view of a single person's true role, once per turn.
 // Werewolves file, werewolf commands.
 $modules[$m]->addCmd( 'werewolf'  , 'werewolves', 0, 1 );	// $werewolf gives a description of the Werewolf role.
-$modules[$m]->addCmd( 'kills'     , 'werewolves', 0, 1 );	// $kills is the vote command used for the wolves to elect a kill.
+$modules[$m]->addCmd( 'wkill'     , 'werewolves', 0, 1 );	// $kills is the vote command used for the wolves to elect a kill.
 $modules[$m]->addCmd( 'xvote'     , 'werewolves', 0, 1 );	// $xvote cancels the vote, and allows the wolf to change their vote.
 // Defender file, Defender commands.
 $modules[$m]->addCmd( 'defender'  , 'defender'  , 0, 1 );	// $defender gives a description of the Defender role, and allows the GM to enable or disable it.
@@ -74,7 +75,7 @@ $modules[$m]->addHelp( "unplay"   , "{$tr}unplay removes you from the game, or i
 $modules[$m]->addHelp( "townie"   , "{$tr}townie displays a description of what the townie does in game and the commands that apply to their role." );
 $modules[$m]->addHelp( "vidiot"   , "{$tr}vidiot [on/off] enables or disables the Village Idiot role, or, left blank, just displays a description of the role." );
 $modules[$m]->addHelp( $vidiot    , "{$tr}{$vidiot} just displays a description of the Village Idiot role." );
-$modules[$m]->addHelp( "crole"    , "{$tr}crole allows the player to confirm that they have received the note telling them ther role." );
+$modules[$m]->addHelp( "rconfirm" , "{$tr}rconfirm allows the player to confirm that they have received the note telling them ther role." );
 $modules[$m]->addHelp( "mute"     , "{$tr}mute <i>[privclass]</i> silences the provided privclass." );
 $modules[$m]->addHelp( "unmute"   , "{$tr}unmute <i>[privclass]</i> unsilences the provided privclass." );
 $modules[$m]->addHelp( "gm"       , "{$tr}gm allows the first <i>active player</i> to use it to take up the role of GameMaster." );

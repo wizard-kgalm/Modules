@@ -24,7 +24,7 @@ switch ( $args[0] ) {
 		if( !isset( $config->df['werewolf']['roles'][strtolower( $args[1] )] ) ) {
 			return $dAmn->say( "$from: You can only vote to kill an active player.", $c );
 		}
-		if( isset( $config->df['werewolf']['wolf'][strtolower( $args[1] )] ) && ( strtolower( $args[2] ) !== "yes" || strtolower( $args[2] ) !== "confirm" ) ) {
+		if( isset( $config->df['werewolf']['wolf'][strtolower( $args[1] )] ) && ( strtolower( $args[2] ) !== "yes" && strtolower( $args[2] ) !== "confirm" ) ) {
 			return $dAmn->say( "$from: To elect to kill a werewolf, you must use {$tr}wkill {$args[1]} <i>yes/confirm</i>.", $c );
 		}
 		$config->df['werewolf']['wolfvotes']++;
@@ -34,7 +34,7 @@ switch ( $args[0] ) {
 			$config->df['werewolf']['tokill'] = strtolower( $args[1] );
 		}
 		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
-		$dAmn->say( "$from: You have voted to kill {$args[1]}. {$args[1]} has {$config->df['werewolf']['killvote'][strtolower( $args[1] )]} votes out of {$config->df['werewolf']['werewolves']} votes. To change your vote, use {$tr}xvote.", $c );
+		$dAmn->say( "$from: You have voted to kill {$args[1]}. {$args[1]} has {$config->df['werewolf']['killvote'][strtolower( $args[1] )]} votes out of {$config->df['werewolf']['wolves']} votes. To change your vote, use {$tr}xvote.", $c );
 		if( $config->df['werewolf']['wolfvotes'] == $config->df['werewolf']['wolves'] ) {
 			if( isset( $config->df['werewolf']['tokill'] ) ) {
 				$dAmn->say( "The wolves have selected to kill {$config->df['werewolf']['tokill']}. You may all /part now.", $c );

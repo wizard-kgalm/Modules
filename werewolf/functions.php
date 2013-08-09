@@ -2,6 +2,7 @@
 function autorole() {
 	global $config, $dAmn, $Timer;
 	$backroom 	 = $config->df['werewolf']['backroom'];					// Let's get this shit loaded. Werewolf is a fucking monster to code for. 
+	$gameroom    = $config->df['werewolf']['gameroom'];
 	$hunter   	 = $config->df['werewolf']['sp']['hunter'];					// Hunter. He takes someone down with him in death.
 	$cupid    	 = $config->df['werewolf']['sp']['cupid'];				// Cupid. Selects our lovers, who, if either die, the other goes with them.
 	$defender 	 = $config->df['werewolf']['sp']['defender'];			// Defender. They have the ability to protect a person from the wolves.
@@ -28,7 +29,7 @@ function autorole() {
 		$wolfc = 5;														
 	}
 	if( $pcnt > 24 ) {													// 24+ players? HA, That'll be the fucking day. This game's going on forever.
-		$wolfc = 5
+		$wolfc = 5;
 	}
 	if( $hunter ){
 		$assignments[] = 'hunter';
@@ -87,6 +88,7 @@ function autorole() {
 				$config->df['werewolf']['roles'][$player]     = 'townie';
 				$config->df['werewolf']['townies'][$player]   = $player;
 				//$config->df['werewolf']['learnrole'][$player] = TRUE;
+				unset( $config->df['werewolf']['notassigned'][$player] );
 				$config->df['werewolf']['tcount']++;
 				note_role( $player );
 				$config->df['werewolf']['confirm'][$player] = TRUE;
@@ -96,6 +98,7 @@ function autorole() {
 		}
 	}
 	$dAmn->say( "$gm: All the players have been assigned, tell them to check their notes, and then use {$tr}confirm.", $backroom );
+	$dAmn->say( "All roles have been assigned, please check your inboxes and then say \"{$tr}confirmrole\" or \"{$tr}rconfirm\". Once everyone has confirmed they know their role, we may begin the game.", $c );
 }
 
 function end_game( ){
@@ -111,8 +114,8 @@ function end_game( ){
 	unset( $config->df['werewolf']['gamemaster'] );
 	unset( $config->df['werewolf']['roles']      );
 	unset( $config->df['werewolf']['assigned']   );
-	unset( $config->df['werewolf']['witchz']     );
-	unset( $config->df['werewolf']['oraclez']    );
+	unset( $config->df['werewolf']['witch']      );
+	unset( $config->df['werewolf']['oracle']     );
 	unset( $config->df['werewolf']['wolves']     );
 	unset( $config->df['werewolf']['wolfkill']   );
 	unset( $config->df['werewolf']['witchkills'] );
@@ -123,6 +126,8 @@ function end_game( ){
 	unset( $config->df['werewolf']['hunter']     );
 	unset( $config->df['werewolf']['defender']   );
 	unset( $config->df['werewolf']['vidiot']     );
+	unset( $config->df['werewolf']['tcount']     );
+	unset( $config->df['werewolf']['notassigned']);
 	unset( $config->df['werewolf']['harlot']     );
 	unset( $config->df['werewolf']['townies']    );
 	unset( $config->df['werewolf']['wolf']       );
@@ -143,7 +148,7 @@ function end_game( ){
 function note_role( $player ) {											// We're going to send each player their role via note!
 	global $config, $dAmn;
 	$username = "Werewolf-Bot";
-	$password = base64_decode( $config->df['logins']['werewolf-bot'] );
+	$password = base64_decode( $config->df['logins']['login']['werewolf-bot'] );
 	if( isset( $config->df['cookiejar']['werewolf-bot'] ) ) {
 		$cookie = $config->df['cookiejar']['werewolf-bot'];				// Let's test that cookie.
 		$response = $dAmn->send_headers( fsockopen( "tcp://www.deviantart.com", 80), "www.deviantart.com", "/", "", "", $cookie );
@@ -164,7 +169,7 @@ function note_role( $player ) {											// We're going to send each player the
 	}
 	if( $cookie === NULL || empty( $cookie ) ) {
 		$cookie = $dAmn->getCookie( $username, $password );
-		$config->df['cookiejar'][strtolower( $username )] = $cookie_jar;
+		$config->df['cookiejar'][strtolower( $username )] = $cookie;
 		$config->save_info( "./config/cookiejar.df", $config->df['cookiejar'] );
 	}
 	$devpage = file_get_contents( "http://{$player}.deviantar.com" );
@@ -192,7 +197,7 @@ function note_role( $player ) {											// We're going to send each player the
 function note_players( $player1, $player2, $type = FALSE ) {			// We're going to send the selected players their notes.
 	global $config, $dAmn;												// For this, we'll be sending the notes from the bot's account.
 	$username = "Werewolf-Bot";
-	$password = base64_decode( $config->df['logins']['werewolf-bot'] );
+	$password = base64_decode( $config->df['logins']['login']['werewolf-bot'] );
 	if( isset( $config->df['cookiejar']['werewolf-bot'] ) ) {
 		$cookie = $config->df['cookiejar']['werewolf-bot'];				// Let's test that cookie.
 		$response = $dAmn->send_headers( fsockopen( "tcp://www.deviantart.com", 80), "www.deviantart.com", "/", "", "", $cookie );
@@ -213,7 +218,7 @@ function note_players( $player1, $player2, $type = FALSE ) {			// We're going to
 	}
 	if( $cookie === NULL || empty( $cookie ) ) {
 		$cookie = $dAmn->getCookie( $username, $password );
-		$config->df['cookiejar'][strtolower( $username )] = $cookie_jar;
+		$config->df['cookiejar'][strtolower( $username )] = $cookie;
 		$config->save_info( "./config/cookiejar.df", $config->df['cookiejar'] );
 	}
 	$devpage = file_get_contents( "http://{$player1}.deviantart.com/" );	// We need to get the user IDs. 

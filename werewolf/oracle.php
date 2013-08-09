@@ -10,7 +10,7 @@ switch ( $args[0] ) {
 		if( strtolower( $c ) !== $backroom ) {
 			return $dAmn->say( "$from: This is a dAmnWerewolf command, and is part of the game. As such, it can only be used in the backroom.", $c );
 		}
-		if( !isset( $config->df['werewolf']['oracle'][strtolower( $from )] ) ) {
+		if( strtolower( $from ) !== $config->df['werewolf']['oracle'] ) {
 			return $dAmn->say( "$from: This can only be used by the Oracle.", $c );
 		}
 		if( $config->df['werewolf']['oracleview'] === FALSE ) {

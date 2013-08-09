@@ -60,7 +60,7 @@ switch ( $args[0] ){
 		if( strtolower( $args[1] ) == $config->df['werewolf']['gamemaster'] ) {
 			return $dAmn->say( "$from: You cannot kill the GameMaster", $c );
 		}
-		if( empty( $args[2] ) || $args[2] !== "confirm" || $args[2] !== "yes" ) {
+		if( empty( $args[2] ) || ( $args[2] !== "confirm" && $args[2] !== "yes" ) ) {
 			return $dAmn->say( "$from: Are you sure you want to hunt {$args[1]}, <i>{$tr}hunt {$args[1]} confirm/yes</i>.", $c );
 		}
 		$death = strtolower( $args[1] );

@@ -1,18 +1,9 @@
 <?php
 $gameroom = $config->df['werewolf']['gameroom'];
 $backroom = $config->df['werewolf']['backroom'];
-$round    = $config->df['werewolf']['round'];
-$status   = $config->df['werewolf']['status'];
-$turn     = $config->df['werewolf']['turn'];
-$talk     = $config->df['werewolf']['muted'];
-$day      = $config->df['werewolf']['day'];
-$changed  = $config->df['werewolf']['changed'];
-if(!isset($gameroom)){
-	$gameroom = $c;
-}
 switch ( $args[0] ) {
 	case "play":
-		if( strtolower( $c ) !==  $gameroom || strtolower( $c ) !== $backroom ) {
+		if( strtolower( rChatName( $c ) ) !==  $gameroom && strtolower( rChatName( $c ) ) !== $backroom ) {
 			return $dAmn->say( "$from: This command is part of Werewolf and can only be used in the game room, or back room for the game. Gameroom: {$gameroom}. Backroom: {$backroom}", $c );
 		}
 		if( isset( $config->df['werewolf']['players'][strtolower( $from )] ) ) {
@@ -31,6 +22,24 @@ switch ( $args[0] ) {
 		$config->df['werewolf']['count']++;
 		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 	break;
+	case "rconfirm":
+	case "confirmrole":
+		if( strtolower( $c ) !== $gameroom && strtolower( $c ) !== $backroom ) {
+			return $dAmn->say( "$from: This command is part of Werewolf and can only be used in the game room, or back room for the game. Gameroom: {$gameroom}. Backroom: {$backroom}", $c );
+		}
+		if( !isset( $config->df['werewolf']['players'][strtolower( $from )] ) ) {
+			return $dAmn->say( "$from: This is so active players may confirm that they have received their roles.", $c );
+		}
+		if( !isset( $config->df['werewolf']['confirm'][strtolower( $from )] ) ) {
+			return $dAmn->say( "$from: Your role has already been confirmed.", $c );
+		}
+		unset( $config->df['werewolf']['confirm'][strtolower( $from )] );
+		$dAmn->say( "$from: You have confirmed your role.", $c );
+		if( empty( $config->df['werewolf']['confirm'] ) ) {
+			unset( $config->df['werewolf']['confirm'] );
+		}
+		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
+	break;
 	case "unplay":
 		$sprole = array(
 			"witch"     => "witch"   ,
@@ -40,9 +49,10 @@ switch ( $args[0] ) {
 			"cupid"     => "cupid"   ,
 			"harlot"    => "harlot"  ,
 			"defender"  => "defender",
-			"vidiot"    => "vidiot" 
+			"vidiot"    => "vidiot"  ,
+			"gamemaster"=> "gamemaster"
 		);
-		if( strtolower( $c ) !== $gameroom || strtolower( $c ) !== $backroom ) {
+		if( strtolower( $c ) !== $gameroom && strtolower( $c ) !== $backroom ) {
 			return $dAmn->say( "$from: This command is part of Werewolf and can only be used in the game room, or back room for the game. Gameroom: {$gameroom}. Backroom: {$backroom}", $c );
 		}
 		if( !isset( $config->df['werewolf']['players'][strtolower( $from )] ) ) {
@@ -64,7 +74,9 @@ switch ( $args[0] ) {
 			$dAmn->say( "$gm: You need someone to fill {$role}.", $backroom );
 		} else {
 			unset( $config->df['werewolf']['townies'][strtolower( $from )] );
-			$config->df['werewolf']['tcount']--;
+			if( $sprole[$role] !== "gamemaster" ) {
+				$config->df['werewolf']['tcount']--;
+			}
 		}
 		unset( $config->df['werewolf']['roles'][strtolower( $from )] );
 		unset( $config->df['werewolf']['notassigned'][strtolower( $from )] );
@@ -75,7 +87,7 @@ switch ( $args[0] ) {
 		$dAmn->say( "$from has left the game.", $c );
 	break;
 	case "gm":
-		if( strtolower( $c ) !== $gameroom || strtolower( $c ) !== $backroom ) {
+		if( strtolower( $c ) !== $gameroom && strtolower( $c ) !== $backroom ) {
 			return $dAmn->say( "$from: This command is part of Werewolf and can only be used in the game room, or back room for the game. Gameroom: {$gameroom}. Backroom: {$backroom}", $c );
 		}
 		if( !isset( $config->df['werewolf']['players'][strtolower( $from )] ) ) {
@@ -88,7 +100,8 @@ switch ( $args[0] ) {
 			return $dAmn->say( "$from: You already have a role, and it appears a game is in progress.", $c );
 		}
 		$config->df['werewolf']['roles'][strtolower( $from )] = "gamemaster";
-		$config->df['werewolf']['gamemaser'] = strtolower( $from );
+		$config->df['werewolf']['gamemaster'] = strtolower( $from );
+		unset( $config->df['werewolf']['notassigned'][strtolower( $from )] );
 		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 		$dAmn->promote( $from, "GameMaster", $gameroom );
 		$dAmn->promote( $from, "GameMaster", $backroom );

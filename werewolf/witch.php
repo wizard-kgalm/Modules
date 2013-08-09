@@ -12,21 +12,21 @@ switch ( $args[0] ) {
 		if( strtolower( $c ) !== $backroom ) {
 			return $dAmn->say( "$from: This is a dAmnWerewolf command, and is part of the game. As such, it can only be used in the backroom.", $c );
 		}
-		if( !isset( $config->df['werewolf']['witch'][strtolower( $from )] ) ) {
+		if( strtolower( $from ) !== $config->df['werewolf']['witch'] ) {
 			return $dAmn->say( "$from: This can only be used by the Witch.", $c );
 		}
-		if( !isset( $config->df['werewolf']['todie'] ) ) {
+		if( !isset( $config->df['werewolf']['tokill'] ) ) {
 			$dAmn->say( "$from: The wolves do not have anyone selected to die.", $c );
 		} else {
 			$dAmn->say( "$from: The wolves have selected {$config->df['werewolf']['tokill']} to kill.", $c );
 		}
 		if( $config->df['werewolf']['witchsave'] === TRUE ) {
-			$dAmn-say( "$from: You can save. Do you wish to save the victim? <i>{$tr}saves {$config->df['werewolf']['tokill']} yes/confirm</i> will do so, but know that it cannot be undone, and you will not be able to save anyone else.", $c );
+			$dAmn->say( "$from: You can save. Do you wish to save the victim? <i>{$tr}saves {$config->df['werewolf']['tokill']} yes/confirm</i> will do so, but know that it cannot be undone, and you will not be able to save anyone else.", $c );
 		} else {
 			$dAmn->say( "$from: You cannot save.", $c );
 		}
 		if( $config->df['werewolf']['witchkill'] === TRUE ) {
-			$dAmn->say( "$from: You can kill. Do you wish to kill someone? <i>{$tr}kill [player] yes/confirm</i> will select them to die.", $c );
+			$dAmn->say( "$from: You can kill. Do you wish to kill someone? <i>{$tr}kills [player] yes/confirm</i> will select them to die.", $c );
 		} else {
 			$dAmn->say( "$from: You cannot kill.", $c );
 		}
@@ -36,7 +36,7 @@ switch ( $args[0] ) {
 		if( strtolower( $c ) !== $backroom ) {
 			return $dAmn->say( "$from: This is a dAmnWerewolf command, and is part of the game. As such, it can only be used in the backroom.", $c );
 		}
-		if( !isset( $config->df['werewolf']['witch'][strtolower( $from )] ) ) {
+		if( strtolower( $from ) !== $config->df['werewolf']['witch'] ) {
 			return $dAmn->say( "$from: This can only be used by the Witch.", $c );
 		}
 		if( $config->df['werewolf']['witchsave'] === FALSE ) {
@@ -45,7 +45,7 @@ switch ( $args[0] ) {
 		if( empty( $args[1] ) ) {
 			return $dAmn->say( "$from: See <i>{$tr}save ? </i> for correct usage.", $c );
 		}
-		if( strtolower( $args[2] ) !== "yes" || strtolower( $args[2] ) !== "confirm" ) {
+		if( strtolower( $args[2] ) !== "yes" && strtolower( $args[2] ) !== "confirm" ) {
 			return $dAmn->say( "$from: Are you sure you want to save them? <i>{$tr}saves [player] yes/confirm</i>.", $c );
 		}
 		if( !isset( $config->df['werewolf']['roles'][strtolower( $args[1] )] ) ) {
@@ -63,7 +63,7 @@ switch ( $args[0] ) {
 		if( strtolower( $c ) !== $backroom ) {
 			return $dAmn->say( "$from: This is a dAmnWerewolf command, and is part of the game. As such, it can only be used in the backroom.", $c );
 		}
-		if( !isset( $config->df['werewolf']['witch'][strtolower( $from )] ) ) {
+		if( strtolower( $from ) !== $config->df['werewolf']['witch'] ) {
 			return $dAmn->say( "$from: This can only be used by the Witch.", $c );
 		}
 		if( $config->df['werewolf']['witchkill'] === FALSE ) {
@@ -72,7 +72,7 @@ switch ( $args[0] ) {
 		if( empty( $args[1] ) ) {
 			return $dAmn->say( "$from: See <i>{$tr}save ? </i> for correct usage.", $c );
 		}
-		if( strtolower( $args[2] ) !== "yes" || strtolower( $args[2] ) !== "confirm" ) {
+		if( strtolower( $args[2] ) !== "yes" && strtolower( $args[2] ) !== "confirm" ) {
 			return $dAmn->say( "$from: Are you sure you want to save them? <i>{$tr}saves [player] yes/confirm</i>.", $c );
 		}
 		if( !isset( $config->df['werewolf']['roles'][strtolower( $args[1] )] ) ) {

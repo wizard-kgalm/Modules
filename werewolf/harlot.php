@@ -32,7 +32,7 @@ switch ( $args[0] ) {
 		if( strtolower( $c ) !== $backroom ) {											// Gotta be in the back room.
 			return $dAmn->say( "$from: This command is for the dAmnWerewolves backroom, and is part of the game. It cannot be used outside of the game.", $c );
 		}
-		if( !isset( $config->df['werewolf']['harlot'][strtolower( $from )] ) ) {		// We can't allow anyone other than the harlot to use this..
+		if( strtolower( $from ) !== $config->df['werewolf']['harlot'] ) {				// We can't allow anyone other than the harlot to use this..
 			return $dAmn->say( "$from: Only the harlot may use this command.", $c );
 		}
 		if( empty( $args[1] ) ) {														// We need someone to sleep with/defend..

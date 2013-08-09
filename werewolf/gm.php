@@ -2,6 +2,8 @@
 include_once( "./modules/werewolf/functions.php" );
 $status = $config->df['werewolf']['status'];
 $round  = $config->df['werewolf']['round'];
+$gameroom = $config->df['werewolf']['gameroom'];
+$backroom = $config->df['werewolf']['backroom'];
 switch( $args[0] ) {
 	case "gamemaster":
 		$dAmn->say("$from: <ul><li> <b>Game Master</b>: The Game Master runs the game. They also moderate it. They are the ones who assign the roles, and they are responsible for the player's roles. These are the commands they use:<br></li>
@@ -14,17 +16,20 @@ switch( $args[0] ) {
 		<li> <b>{$tr}end</b> will end the game, and clear everyone back to the Audience privclass. (<b>NOTE</b>: A player may end the game if they promote themselves to the Game Master privclass and use the command).</li></ul>", $c );
 	break;
 	case "autoassign":
-		if($args[1] == "on"){
-			$config->df['werewolf']['autorole'] = TRUE;
-			$dAmn->say("$from: Autoassigning is now enabled!",$c);
-			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
-		}
-		if($args[1] == "off"){
-			$config->df['werewolf']['autorole'] = FALSE;
-			$dAmn->say("$from: Autoassign has been disabled!",$c);
-			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
-		} else {
-			$dAmn->say( "$from: This controls whether or not the bot is allowed to use the auto-assigner at the beginning of the game.", $c );
+		switch( $args[1] ) {
+			case "on" :
+				$config->df['werewolf']['autorole'] = TRUE;
+				$dAmn->say("$from: Autoassigning is now enabled!",$c);
+				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
+			break;
+			case "off":
+				$config->df['werewolf']['autorole'] = FALSE;
+				$dAmn->say("$from: Autoassign has been disabled!",$c);
+				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
+			break;
+			default: 
+				$dAmn->say( "$from: This controls whether or not the bot is allowed to use the auto-assigner at the beginning of the game.", $c );
+			break;
 		}
 	break;
 	case "assign":
@@ -34,7 +39,7 @@ switch( $args[0] ) {
 		if( $config->df['werewolf']['gamemaster'] != strtolower( $from ) ) {
 			return $dAmn->say( "$from: Only the GameMaster may initialize the autoassigner.", $c );
 		}
-		if( $config->df['werewolf']['autoassign'] === FALSE || !isset( $config->df['werewolf']['autoassign'] ) ) {
+		if( $config->df['werewolf']['autorole'] === FALSE || !isset( $config->df['werewolf']['autorole'] ) ) {
 			return $dAmn->say( "$from: Autoassigning is currently disabled. <i>{$tr}autoassign on</i> to change it.", $c );
 		}
 		autorole();
@@ -72,6 +77,15 @@ switch( $args[0] ) {
 		$dAmn->set( "title", "Game status: :bulletgreen: <b>Open</b> (join by typing <b>{$tr}play</b>)", $gameroom );
 	break;
 	case "sunset":														// Our switch for the fun to begin.
+		if( strtolower( $c ) !== $gameroom ) {
+			 return $dAmn->say( "$from: This command is part of Werewolf and can only be used in the game room, or back room for the game. Gameroom: {$gameroom}. Backroom: {$backroom}", $c );
+		}
+		if( strtolower( $from ) !== $config->df['werewolf']['gamemaster'] ) {
+			return $dAmn->say( "$from: This command is for the GameMaster only.", $c );
+		}
+		if( isset( $config->df['werewolf']['confirm'] ) ) {
+			return $dAmn->say( "$from: There are still roles that need to be confirmed before we can continue.", $c );
+		}
 		if( $config->df['werewolf']['day'] == "Night" ) {
 			return $dAmn->say( "$from: The sun has already set.", $c );
 		}
@@ -107,7 +121,7 @@ switch( $args[0] ) {
 		$dAmn->say( "$from: Witch potions set.", $backroom );
 	break;
 	case "backroom":
-		switch( $args[1] ) ) {
+		switch( $args[1] ) {
 			case "set":
 				if( empty( $args[2] ) ) {
 					return $dAmn->say( "$from: I need a room to set the back room to. {$tr}backroom set [#room].", $c );
@@ -209,7 +223,7 @@ switch( $args[0] ) {
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			return $dAmn->say("$from: {$args[1]} is now the {$args[2]}.",$c);
 		}
-		if( strtolower( $args[2]) = "townie" ) {
+		if( strtolower( $args[2]) == "townie" ) {
 			$config->df['werewolf']['roles'][strtolower( $args[1] )] = "townie";
 			$config->df['werewolf']['townies'][strtolower( $args[1] )] = strtolower( $args[1] );
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
@@ -268,12 +282,14 @@ switch( $args[0] ) {
 			return $dAmn->say( "$from: Only the GameMaster may call upon {$tr}sunrise", $c );
 		}
 		if( isset( $config->df['werewolf']['antikill'] ) ) {			// Harlot is sleeping with a wolf.
-			unset( $config->df['werewolf']['wolfkill'] );				// Their kill has been nullified at sunrise.
+			unset( $config->df['werewolf']['tokill'] );					// Their kill has been nullified at sunrise.
+			unset( $config->df['werewolf']['killvote'] );
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 		}
-		if( isset( $config->df['werewolf']['wolfkill'] ) ) {			// The witch unsets the wolfkill, so we need to check that here.
-			$death = $config->df['werewolf']['wolfkill'];				// $death is the person who has been selected by the wolves.
-			unset( $config->df['werewolf']['wolfkill'] );
+		if( isset( $config->df['werewolf']['tokill'] ) ) {			// The witch unsets the tokill, so we need to check that here.
+			$death = $config->df['werewolf']['tokill'];				// $death is the person who has been selected by the wolves.
+			unset( $config->df['werewolf']['tokill'] );
+			unset( $config->df['werewolf']['killvote'] );
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			$dcount = 1;
 			$say = $death . ", ";
@@ -287,7 +303,7 @@ switch( $args[0] ) {
 			if( $wclass == "Harlot" ) {									// OH SHIT, YOU KILLED THE HARLOT;
 				if( $config->df['werewolf']['todefend'] == $config->df['werewolf']['witch'] ) {
 					$death3 = $config->df['werewolf']['witch'];
-					$dcount++
+					$dcount++;
 					$say .= $death3 . ", ";
 				}
 			}
@@ -296,7 +312,8 @@ switch( $args[0] ) {
 		}
 		if( isset( $config->df['werewolf']['defending'] ) ) {			// The harlot and defender both start here, this is the diverging point.
 			if( $config->df['werewolf']['defending'] == $death ) {
-				unset( $config->df['werewolf']['wolfkill'] );
+				unset( $config->df['werewolf']['tokill'] );
+				unset( $config->df['werewolf']['killvote'] );
 				unset( $config->df['werewolf']['defending'] );
 				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] ); 
 			}
@@ -394,6 +411,7 @@ switch( $args[0] ) {
 		}
 		$config->df['werewolf']['day'] = "Day";
 		$turn = "Townies ( Lynching )";
+		unset( $config->df['werewolf']['killvote'] );
 		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 		$dAmn->set( "title", "Game status: :bulletred: <b>{$status}</b> | Time: <b>Day</b> | Player status: :bulletgreen: <b>Open</b>", $gameroom );
 	break;
@@ -428,7 +446,7 @@ switch( $args[0] ) {
 		if( strtolower( $args[1] ) == $config->df['werewolf']['gamemaster'] ) {
 			return $dAmn->say( "$from: You cannot kill the GameMaster", $c );
 		}
-		if( empty( $args[2] ) || $args[2] !== "confirm" || $args[2] !== "yes" ) {
+		if( empty( $args[2] ) || ( $args[2] !== "confirm" && $args[2] !== "yes" ) ) {
 			return $dAmn->say( "$from: Are you sure you want to lynch {$args[1]}, <i>{$tr}lynch {$args[1]} confirm/yes</i>.", $c );
 		}
 		$death = strtolower( $args[1] );
@@ -472,7 +490,7 @@ switch( $args[0] ) {
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			$dAmn->promote( $death2, $p2class, $gameroom );
 			$dAmn->promote( $death2, "Dead"  , $backroom );
-			$config->df['werewolf']['tcount'] 
+			$config->df['werewolf']['tcount']--; 
 			if( $p2class == "Hunter" ) {
 				$dAmn->say( "{$death2}: As the hunter, you are able to select someone to kill before completely dying. <i>{$tr}hunt [player]</i>.", $c );
 			}

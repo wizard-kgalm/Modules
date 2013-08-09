@@ -54,7 +54,7 @@ switch( $args[0] ) {
 		}
 		if( strtolower( $args[1] ) == strtolower( $from ) && ( $args[2] != "yes" || $args[2] != "confirm" ) ) { // We need confirmation that you want to defend yourself.
 			return $dAmn->say( "$from: Are you sure you want to defend yourself? ( Say {$tr}defend {$args[1]} yes/confirm )", $c );
-		} elseif ( strtolower( $args[1] ) == strtolower( $from ) && ( $args[2] == "yes" || $args[2] == "confirm" ) ) {
+		} elseif ( strtolower( $args[1] ) == strtolower( $from ) && ( $args[2] == "yes" && $args[2] == "confirm" ) ) {
 			if( $config->df['werewolf']['selfdefend'] === TRUE ) {						// This is in place to allow you to defend yourself but ONCE per game.
 				$config->df['werewolf']['selfdefend'] = FALSE;							// Having used that, it is now set to FALSE.
 				$config->df['werewolf']['defending']   = strtolower( $args[1] );		// ['defending'] is the currently active defense. Should the werewolves select this, 

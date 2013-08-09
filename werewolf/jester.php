@@ -8,7 +8,7 @@ switch ( $args[0] ) {
 			case "off":
 				( strtolower( $args[1] ) == "off" ) ? $stat = "FALSE" : $stat = "TRUE";
 				( strtolower( $args[1] ) == "off" ) ? $msg = "disabled" : $msg = "enabled";
-				if( strtolower( $from ) !== $config->df['werewolf']['gamemaster'] || $user->has( $from, 99 ) ) {
+				if( strtolower( $from ) !== $config->df['werewolf']['gamemaster'] && $user->has( $from, 99 ) ) {
 					return $dAmn->say( "$from: Only the GameMaster may change the status of the Jester role.", $c );
 				}
 				$config->df['werewolf']['sp']['jester'] = $stat;
@@ -37,7 +37,7 @@ switch ( $args[0] ) {
 		if( strtolower( $from ) !== $config->df['werewolf']['jester'] ) {
 			return $dAmn->say( "$from: This command is for the Jester only.", $c );
 		}
-		if( empty( $args[1] ) || empty( $args[2] ) ) {
+		if( empty( $args[1] ) && empty( $args[2] ) ) {
 			return $dAmn->say( "$from: See <i>{$tr}swaprole ?</i> for correct usage.", $c );
 		}
 		if( !isset( $config->df['werewolf']['roles'][strtolower( $args[1] )] ) || !isset( $config->df['werewolf']['roles'][strtolower( $args[2] )] ) ) {
@@ -61,8 +61,8 @@ switch ( $args[0] ) {
 		if( isset( $sprole[$role2] ) ) {
 			$config->df['werewolf'][$role2] = strtolower( $args[1] );
 		}
-		$config->df['werewolf']['roles'][strtolower( $args[1] ) = $role2;
-		$config->df['werewolf']['roles'][strtolower( $args[2] ) = $role1;
+		$config->df['werewolf']['roles'][strtolower( $args[1] )] = $role2;
+		$config->df['werewolf']['roles'][strtolower( $args[2] )] = $role1;
 		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 		$dAmn->say( "$from: {$args[1]} and {$args[2]}'s roles have been swapped! You may now /part.", $c );
 	break;
