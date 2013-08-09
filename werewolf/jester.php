@@ -13,6 +13,7 @@ switch ( $args[0] ) {
 				}
 				$config->df['werewolf']['sp']['jester'] = $stat;
 				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
+				$dAmn->say( "$from: The Jester role has been {$msg}.", $c );
 			break;
 			default:
 				$dAmn->say( "$from: <li> <b>Jester</b>: The Jester role is one newly introduced in this version, and is an optional role. They have a different power from the other roles. Like Cupid, this can only be done once, but like the witch, it may be done during any round. They are allowed to switch the roles of two players. The players who have had their role switched will have it done during the DAY TIME, and will not know who they switched roles with. They will be informed by note. This is the command the Jester uses:</li><br><ul><li> <b>{$tr}swaprole <i>[player1] [player2]</i></b>. This will change their stored role on the bot, and the bot will note the victims of this amusing change.</li></ul>", $c );

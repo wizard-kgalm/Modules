@@ -117,6 +117,7 @@ function end_game( ){
 	unset( $config->df['werewolf']['wolfkill']   );
 	unset( $config->df['werewolf']['witchkills'] );
 	unset( $config->df['werewolf']['witchkill']  );
+	unset( $config->df['werewolf']['wtodie']     );
 	unset( $config->df['werewolf']['count']      );
 	unset( $config->df['werewolf']['lovers']     );
 	unset( $config->df['werewolf']['hunter']     );

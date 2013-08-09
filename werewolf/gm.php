@@ -331,6 +331,7 @@ switch( $args[0] ) {
 				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			}
 			unset( $config->df['werewolf']['roles'][$death] );
+			$config->df['werewolf']['dead'][$death] = $death;
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			$dAmn->promote( $death, $dclass, $gameroom );
 			$dAmn->promote( $death, "Dead" , $backroom );
@@ -343,7 +344,8 @@ switch( $args[0] ) {
 				$config->df['werewolf']['wolves']--;
 				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			}
-			unset( $config->df['werewolf']['roles'][$death2] );
+			unset( $config->df['werewolf']['roles'][$wdeath] );
+			$config->df['werewolf']['dead'][$wdeath] = $wdeath;
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			$dAmn->promote( $wdeath, $wclass, $gameroom );
 			$dAmn->promote( $wdeath, "Dead" , $backroom );
@@ -356,6 +358,7 @@ switch( $args[0] ) {
 			$dAmn->promote( $death3, "Dead" , $backroom );
 			$config->df['werewolf']['tcount']--;
 			unset( $config->df['werewolf']['roles'][$death3] );
+			$config->df['werewolf']['dead'][$death3] = $death3;
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );	
 		}
 		if( isset( $p2class ) ) {
@@ -366,6 +369,7 @@ switch( $args[0] ) {
 				$config->df['werewolf']['tcount']--;
 				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			}
+			$config->df['werewolf']['dead'][$death2] = $death2;
 			unset( $config->df['werewolf']['roles'][$death2] );
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			$dAmn->promote( $death2, $p2class, $gameroom );
@@ -448,6 +452,7 @@ switch( $args[0] ) {
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 		}
 		unset( $config->df['werewolf']['roles'][$death] );
+		$config->df['werewolf']['dead'][$death] = $death;
 		$config->save_config( "./config/werewolf.df", $config->df['werewolf'] ); 
 		$dAmn->promote( $death, $dclass, $gameroom );
 		$dAmn->promote( $death, "Dead" , $backroom );
@@ -463,6 +468,7 @@ switch( $args[0] ) {
 				$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			}
 			unset( $config->df['werewolf']['roles'][$death2] );
+			$config->df['werewolf']['dead'][$death2] = $death2;
 			$config->save_config( "./config/werewolf.df", $config->df['werewolf'] );
 			$dAmn->promote( $death2, $p2class, $gameroom );
 			$dAmn->promote( $death2, "Dead"  , $backroom );
