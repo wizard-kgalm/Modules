@@ -98,7 +98,7 @@ switch($args[0]){
 					llama( $args[1], $cookie_jar, $password, $person2 );
 					$dAmn->send( "pong\n" . chr( 0 ) );
 			}
-			$dAmn->say("$from: ".count($config['logins']['login'])." llamas sent to $args[1]!",$c);
+			$dAmn->say("$from: ".count($config->df['logins']['login'])." llamas sent to $args[1]!",$c);
 		}else{
 			foreach( $config->logins['login'] as $person2 => $password ){
 				if( !isset($config->df['llamasend']['users'][$person2])){
@@ -107,7 +107,7 @@ switch($args[0]){
 					llama( null, $cookie_jar, $password, $person2 );
 					$dAmn->send( "pong\n" . chr( 0 ) );
 			}
-			$dAmn->say( "$from: ". count($config->logins['login'])." random llamas sent!", $c );
+			$dAmn->say( "$from: ". count($config->df['logins']['login'])." random llamas sent!", $c );
 		}
 	break;
 	case "cookieclear":

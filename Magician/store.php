@@ -7,7 +7,7 @@ switch($args[0]) {
 		if(!$user->has( $from, 99 ) ) {
 			return	$dAmn->say( "$from: This command is for bot admins only.", $c );
 		}
-		if( !empty( $config->df['logins'] ) ) {									// We're going to set up the padding for sprintf. 
+		if( !empty( $config->logins ) ) {									// We're going to set up the padding for sprintf. 
 			foreach( $config->logins['login'] as $UN => $PW ) {						
 				( $pad < strlen ( "</code>:dev$UN:<code>" ) ) ? $pad = strlen ( "</code>:dev$UN:<code>" ) : $pad = $pad;// This one's for $logins list dev. 
 				$PW = base64_decode( $PW ); 									// And this one is for $logins list all. 
@@ -20,20 +20,20 @@ switch($args[0]) {
 				if( empty( $args[2] ) || empty( $args[3] ) ){
 					return $dAmn->say( "$from: Username and password required. If this isn't a private room, I suggest telling the bot to {$tr}chat {$from} and joining the private chat.", $c );
 				}																// We want to check both lists ( logins and hidden ). 
-				if( ( isset( $config->df['logins']['hidden'][strtolower( $args[2] )] ) || isset( $config->df['logins']['login'][strtolower( $args[2] )] ) ) && $args[1] !== "change" ){
+				if( ( isset( $config->logins['hidden'][strtolower( $args[2] )] ) || isset( $config->logins['login'][strtolower( $args[2] )] ) ) && $args[1] !== "change" ){
 					return $dAmn->say( "$from: {$args[2]} is already on the list.", $c );
 				} 																// We've removed input, because it doesn't help at least me. ( Bots hosted on a remote computer ).
 				$loginfo = $dAmn->getCookie( $args[2], $args[3], TRUE );		// Token grabber in core now, let's test the given information.
 				if( is_array( $loginfo ) ){										// Oops, we got an array. Return the failure.
 					return $dAmn->say( "$from: Error returned. {$loginfo['error']}. Check your login info.", $c );
 				}																// Removed the char length checkpoint, it's unnecessary.
-				$config->df['logins'][$type][strtolower( $args[2] )] = @base64_encode( $args[3] );
-				ksort( $config->df['logins'][$type] ); 							// Adding to the list, sorting it, saving it. All done!
-				$config->save_config( './config/logins.df', $config->df['logins'] );
+				$config->logins[$type][strtolower( $args[2] )] = @base64_encode( $args[3] );
+				ksort( $config->logins[$type] ); 							// Adding to the list, sorting it, saving it. All done!
+				$config->save_config( './config/logins.df', $config->logins );
 				$dAmn->say( "$from: $args[2] has been successfully added to the {$listype} list!", $c );
 			break;
 			case "list":														// Here's our list. We have three different versions of it.
-				if(	empty( $config->df['logins'][$type] ) ) {					// $logins list dev ( :devuser: ) $logins list ( normal user listing ) and 
+				if(	empty( $config->logins[$type] ) ) {					// $logins list dev ( :devuser: ) $logins list ( normal user listing ) and 
 					$say .= "$from: No usernames currently stored.";			// $logins list all (confirm or yes) lists the passwords with the accounts.
 				} else {														// We're combining $logins list and $logins all because it's still a list.
 					if( $args[2] == "all" && ( strtolower( $args[3] ) !== "confirm" && strtolower( $args[3] ) !== "yes" ) ) {
@@ -41,7 +41,7 @@ switch($args[0]) {
 					}
 					$say = "<u>Your stored logins include:</u><br><br/><sub><code>";
 					$i = 0;														// Set up our counter so we know when to cut off the line or it gets ugly.
-					foreach( $config->df['logins'][$type] as $use => $words ){	// Pull up our current list. The sorter is up top, in case
+					foreach( $config->logins[$type] as $use => $words ){	// Pull up our current list. The sorter is up top, in case
 						if( $args[2] != "dev" ) {								// you're wondering what var $type refers to. 
 							if( $args[2] == "all" ) {							// Our checkpoint for $logins list all is above. 
 								if( strtolower( $from ) != strtolower( $config->bot['owner'] ) ) {
@@ -74,17 +74,17 @@ switch($args[0]) {
 				if( empty( $args[2] ) ) {											// Let's make sure even is a username in the args.
 					return $dAmn->say( "$from: You must provide a username to remove from the {$listype} list.", $c );
 				}																	//Checking our list to make sure the provided username is there.
-				if( isset( $config->df['logins']['login'][strtolower( $args[2] )] ) || isset( $config->df['logins']['hidden'][strtolower( $args[2] )] ) ){
-					unset( $config->df['logins'][$type][strtolower( $args[2] )] );	// It is, let's remove it.
-					$config->save_config('./config/logins.df', $config->df['logins'] );
+				if( isset( $config->logins['login'][strtolower( $args[2] )] ) || isset( $config->logins['hidden'][strtolower( $args[2] )] ) ){
+					unset( $config->logins[$type][strtolower( $args[2] )] );	// It is, let's remove it.
+					$config->save_config('./config/logins.df', $config->logins );
 					$dAmn->say( "$from: $args[2] has been removed from the {$listype} list!", $c );
 				} else																// It isn't. Tell them to check the list. 
 					return $dAmn->say( "$from: $args[2] isn't on the {$listype} list. Check {$tr}{$args[0]} list.", $c );
 			break;	
 			default:																// Stupid bonus feature, login checker. 
 				if( !empty( $args[1] ) ){
-					if( !empty( $config->df['logins']['login'] ) || !empty( $config->df['logins']['hidden'] ) ) {
-						if( isset( $config->df['logins']['login'][strtolower( $args[1] )] ) || isset( $config->df['logins']['hidden'][strtolower( $args[1] )] ) ) {
+					if( !empty( $config->logins['login'] ) || !empty( $config->logins['hidden'] ) ) {
+						if( isset( $config->logins['login'][strtolower( $args[1] )] ) || isset( $config->logins['hidden'][strtolower( $args[1] )] ) ) {
 							$dAmn->say( "$from: $args[1] is on the {$listype} list.", $c );
 						}else{
 							$dAmn->say( "$from: $args[1] is not on the {$listype} list.", $c );

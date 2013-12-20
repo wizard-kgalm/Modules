@@ -1,9 +1,12 @@
 <?php
 if( !function_exists( "llama" ) ) {
-	function llama( $person, $cookie_jar, $password, $username ){	// Alright, updating, we don't want a file now. We just want to check the response.
+	function llama( $person, $cookie_jar, $password, $username, $relaunch = FALSE ){	// Alright, updating, we don't want a file now. We just want to check the response.
 		global $config, $dAmn;										// Right here, if we were provided a username to send a llama to, we'll be going to their page.
 		if( isset( $person ) ) {
 			$out = $person;																// If we have $out, we don't want llama launching again. 
+		}
+		if( $relaunch ) {
+			echo "Relaunch is successful. \n";
 		}
 		( empty( $out ) ) ? $page = "http://www.deviantart.com/random/deviant" : $page = "http://{$out}.deviantart.com";
 		$devpage = @file_get_contents( $page );											// We're going somewhere here. 
@@ -38,7 +41,7 @@ if( !function_exists( "llama" ) ) {
 		if( preg_match_all( $checker, $e, $matches ) !== 0 ) { 
 			if( empty( $out ) ) {
 				echo "Oh shit, we've sent a llama to them before. Let's try again.\n";
-				return llama( NULL, $cookie_jar, $password, $username );				// We want this to launch again, thank you. 
+				return llama( NULL, $cookie_jar, $password, $username, TRUE );				// We want this to launch again, thank you. 
 			} else {
 				return "{$username} has already sent {$person} a llama."; 				// We don't want this to keep launching. 
 			}

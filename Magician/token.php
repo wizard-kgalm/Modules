@@ -3,6 +3,7 @@ include_once('modules/Magician/functions.php');
 switch( $args[0] ){
 	case "login":
 	case "token":
+	case "ui":
 		if( empty( $args[1] ) ){
 			return $dAmn->say( "$from: Usage:{$tr}{$args[0]} <i>username [password]</i>. If the username is on the list, it'll try using the password. Otherwise, it'll ask for the password.", $c );
 		}
@@ -16,10 +17,11 @@ switch( $args[0] ){
 			$tpass = base64_decode( $config->logins['hidden'][strtolower( $args[1] )] );// The passwords are encoded.. let's decode the one we'll be using. 			
 		}elseif( !empty($args[2] ) ){													// It's not on either list? If there's a second arg, we'll use that.
 			$tpass = $args[2];
-		}elseif( empty( $args[2] ) ){													// No password. Cannot continue.
+		}elseif( empty( $tpass ) ){														// No password. Cannot continue.
 			return $dAmn->say("$from: $args[1] is not a stored login. Username and password required for non-stored logins.",$c);
-		}
-		$tcheck = $dAmn->getCookie( $tuser, $tpass, TRUE );								// Now for the token grabber. Let's send the username and password.
+		}																				
+		( $args[0] == "ui" ) ? $token = FALSE : $token = TRUE;							// For our userinfo, we only want the cookie. This is for difi calls.
+		$tcheck = $dAmn->getCookie( $tuser, $tpass, $token );							// Now for the token grabber. Let's send the username and password.
 		if( is_array( $tcheck ) && isset( $tcheck['error'] ) ){							// We got an array. We'll return what went wrong.
 			return $dAmn->say("$from: Error returned. {$tcheck['error']}",$c);
 		}
@@ -29,8 +31,12 @@ switch( $args[0] ){
 			$config->save_info( "./config/bot.df", $config->bot );
 			$dAmn->say( "$from: Login accepted. Changing logins, please wait.", $c );	// Let's send the disconnect and log into the new account!
 			$dAmn->send( "disconnect\n".chr( 0 ) );
-		} else {																		// For token, we're just gonna send the javascript command to the requester.
-			$dAmn->say( "$from: javascript: dAmn_Login(\"{$args[1]}\",\"{$tcheck}\");", $c ); 
+		} elseif( $args[0] == "ui" ) {
+			$cookie = explode( "userinfo=", $tcheck[3] );
+			$cookie = $cookie[1];
+			$dAmn->say( "ui={$cookie}", $c );
+		} else {
+			$dAmn->say( "$from: javascript: dAmn_Login(\"{$args[1]}\",\"{$tcheck}\");", $c ); // For token, we're just gonna send the javascript command to the requester.
 		}
 	break;
 	case "atswap":

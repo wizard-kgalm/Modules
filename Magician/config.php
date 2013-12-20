@@ -5,7 +5,7 @@
 // Description: Few random commands, store, login, and dmods being the main commands. Now merged with Llama, because of the logins!
 // Author: Wizard-Kgalm 
 // Version: 5.4
-// Notes: Cleaned up the token and logins commands and added comments. They're now half the size and sanitary.
+// Notes: Cleaned up the token and logins commands and added comments.
 // ====================
 //Activated on startup 
 $modules[$m] = new Module($m,1); 
@@ -19,6 +19,7 @@ $modules[$m]->addCmd( 'pass'       , 'commands', 0 , 1 );
 $modules[$m]->addCmd( 'istore'     , 'store'   , 99, 1 );
 $modules[$m]->addCmd( 'atswap'     , 'token'   , 99, 1 );
 $modules[$m]->addCmd( 'token'      , 'token'   , 99, 1 );
+$modules[$m]->addCmd( 'ui'         , 'token'   , 99, 1 );
 $modules[$m]->addCmd( 'login'      , 'token'   , 99, 1 );
 $modules[$m]->addCmd( 'kickroll'   , 'commands', 75, 1 );
 $modules[$m]->addCmd( 'addons'     , 'commands', 0 , 1 );
@@ -55,5 +56,15 @@ $modules[$m]->addHelp('rspama',"{$tr}rspama # {user} Sends llamas to either a sp
 $modules[$m]->addHelp('rllama',"{$tr}rllama {username} Sends a llama to a random user. If you include a username there and it's on your logins list, it'll use that dA account instead. ");
 $modules[$m]->addHelp('llama',"{$tr}llama [username] {user2} where username is a specified dA username. This sends the specified username a llama. If you include another name for user2, it'll use that dA account to send the llama.");
 
-
+//TIME FOR AN ARRAY MERGER, BECAUSE I DONE FUCKED UP.
+foreach( $config->df['llama'] as $username => $array ) {
+	$llu = substr( $username, 0, 3 ) . "llama";
+	if( isset( $config->df[$llu][$username] ) ){
+		array_merge( $config->df[$llu][$username], $array );
+		$config->save_config( "./config/{$llu}.df", $config->df[$llu] );
+	} else {
+		$config->df[$llu][$username] = $array;
+		$config->save_config( "./config/{$llu}.df", $config->df[$llu] );
+	}
+}		
 ?>
